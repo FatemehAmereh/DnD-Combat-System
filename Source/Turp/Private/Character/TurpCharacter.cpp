@@ -36,4 +36,6 @@ void ATurpCharacter::InitAbilityActorInfo()
 
 	// This will automatically register the attribute set with the ability system on this actor.
 	AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
+
+	InitializeDefaultAttributes();
 }
