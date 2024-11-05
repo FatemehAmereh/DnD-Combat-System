@@ -5,6 +5,6 @@
 
 void UTurpAbilitySystemComponent::AddGameplayAbility(const TSubclassOf<UGameplayAbility> AbilityClass)
 {
-	auto AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+	const auto AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 	GiveAbility(AbilitySpec);
 }
