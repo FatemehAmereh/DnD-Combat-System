@@ -20,7 +20,9 @@ UCLASS()
 class TURP_API UTurpAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-
+public:
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	
 protected:
 // Primary Attributes
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Primary")

@@ -37,6 +37,4 @@ void ATurpCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
 void ATurpCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributesEffect, 1.f);
-	ApplyEffectToSelf(AttributeModifierEffect, 1.f);
-	ApplyEffectToSelf(AttributeSavingThrowEffect, 1.f);
 }

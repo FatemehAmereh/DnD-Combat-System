@@ -37,6 +37,7 @@ protected:
 	TSubclassOf<UGameplayEffect> AttributeSavingThrowEffect;
 	
 	void InitializeDefaultAttributes() const;
+	
 private:
 	virtual void InitAbilityActorInfo();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
