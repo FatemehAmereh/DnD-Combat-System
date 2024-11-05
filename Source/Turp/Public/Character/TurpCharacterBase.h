@@ -28,10 +28,13 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributesEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> DefaultModAttributes;
+	TSubclassOf<UGameplayEffect> AttributeModifierEffect;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
+	TSubclassOf<UGameplayEffect> AttributeSavingThrowEffect;
 	
 	void InitializeDefaultAttributes() const;
 private:
