@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "TurpCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UAttributeSet;
 class UAbilitySystemComponent;
 class UGameplayEffect;
@@ -36,8 +37,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
 	TSubclassOf<UGameplayEffect> AttributeSavingThrowEffect;
 	
-	void InitializeDefaultAttributes() const;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
+	TSubclassOf<UGameplayAbility> StartUpGameplayAbility;
 	
+	void InitializeDefaultAttributes() const;
+	void AddGameplayAbility(const TSubclassOf<UGameplayAbility> AbilityClass);
 private:
 	virtual void InitAbilityActorInfo();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;

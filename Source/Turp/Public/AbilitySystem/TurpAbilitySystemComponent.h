@@ -13,5 +13,7 @@ UCLASS()
 class TURP_API UTurpAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	void AddGameplayAbility(const TSubclassOf<UGameplayAbility> AbilityClass);
 };

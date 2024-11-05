@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
+#include "AbilitySystem/TurpAbilitySystemComponent.h"
 
 ATurpCharacterBase::ATurpCharacterBase()
 {
@@ -37,4 +38,10 @@ void ATurpCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
 void ATurpCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributesEffect, 1.f);
+}
+
+void ATurpCharacterBase::AddGameplayAbility(const TSubclassOf<UGameplayAbility> AbilityClass)
+{
+	const auto TurpAbilitySystemComponent = CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent);
+	TurpAbilitySystemComponent->GiveAbility(AbilityClass);
 }

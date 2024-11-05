@@ -38,4 +38,5 @@ void ATurpCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
 
 	InitializeDefaultAttributes();
+	AddGameplayAbility(StartUpGameplayAbility);
 }
