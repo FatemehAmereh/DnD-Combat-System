@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/TurpPlayerController.h"
 #include "Player/TurpPlayerState.h"
+#include "UI/HUD/TurpHUD.h"
 
 ATurpCharacter::ATurpCharacter()
 {
@@ -37,6 +39,14 @@ void ATurpCharacter::InitAbilityActorInfo()
 	// This will automatically register the attribute set with the ability system on this actor.
 	AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
 
+	if(auto PlayerController = GetController<ATurpPlayerController>())
+	{
+		if(auto HUD = PlayerController->GetHUD<ATurpHUD>())
+		{
+			HUD->InitHUD(AbilitySystemComponent);
+		}
+	}
+	
 	InitializeDefaultAttributes();
 	AddGameplayAbility(StartUpGameplayAbility);
 }

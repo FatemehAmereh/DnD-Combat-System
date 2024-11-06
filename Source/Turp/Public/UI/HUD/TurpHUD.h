@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "TurpHUD.generated.h"
 
+class UAbilitySystemComponent;
 class UOverlayWidgetController;
 class UTurpUserWidget;
 /**
@@ -16,19 +17,19 @@ class TURP_API ATurpHUD : public AHUD
 {
 	GENERATED_BODY()
 public:
-	void InitHUD();
-	UOverlayWidgetController* GetOverlayWidgetController() const;
+	void InitHUD(UAbilitySystemComponent* ASC);
+	UOverlayWidgetController* GetOverlayWidgetController(UAbilitySystemComponent* ASC);
 	
 private:
 	UPROPERTY()
 	TObjectPtr<UTurpUserWidget> OverlayWidget;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UTurpUserWidget> OverlayWidgetClass;
 
 	UPROPERTY()
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 };
