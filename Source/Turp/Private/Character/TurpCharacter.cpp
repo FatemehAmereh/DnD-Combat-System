@@ -48,5 +48,5 @@ void ATurpCharacter::InitAbilityActorInfo()
 	}
 	
 	InitializeDefaultAttributes();
-	AddGameplayAbility(StartUpGameplayAbility);
+	InitializeStartupAbilities(StartUpGameplayAbility);
 }

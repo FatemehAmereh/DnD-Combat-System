@@ -14,5 +14,5 @@ void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityT
 {
 	// TODO: Decide which ability based on Tag
 	
-	CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent)->AddGameplayAbility(TestGameplayAbility);
+	CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent)->ActivateGameplayAbility(AbilityTag);
 }

@@ -30,18 +30,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributesEffect;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> AttributeModifierEffect;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> AttributeSavingThrowEffect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
 	TSubclassOf<UGameplayAbility> StartUpGameplayAbility;
 	
 	void InitializeDefaultAttributes() const;
-	void AddGameplayAbility(const TSubclassOf<UGameplayAbility> AbilityClass);
+	void InitializeStartupAbilities(const TSubclassOf<UGameplayAbility> AbilityClass) const;
 private:
 	virtual void InitAbilityActorInfo();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
