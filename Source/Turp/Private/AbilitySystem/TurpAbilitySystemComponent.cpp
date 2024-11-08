@@ -8,7 +8,7 @@ void UTurpAbilitySystemComponent::ActivateGameplayAbility(const FGameplayTag& Ab
 	// TODO: Optimize this later
 
 	bool found = false;
-	for(const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	for(FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if(AbilitySpec.DynamicAbilityTags.HasTagExact(AbilityTag))
 		{

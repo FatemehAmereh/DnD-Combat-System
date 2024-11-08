@@ -12,6 +12,11 @@ ATurpCharacterBase::ATurpCharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+UAbilitySystemComponent* ATurpCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void ATurpCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/TurpAbilitySystemComponent.h"
 
 void ATurpPlayerController::BeginPlay()
 {
@@ -15,6 +16,14 @@ void ATurpPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
+
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputModeData.SetHideCursorDuringCapture(false);
+	SetInputMode(InputModeData);
 }
 
 void ATurpPlayerController::SetupInputComponent()
@@ -24,6 +33,7 @@ void ATurpPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATurpPlayerController::Move);	
+		EnhancedInputComponent->BindAction(AbilityAction, ETriggerEvent::Triggered, this, &ATurpPlayerController::AbilityActionTrigger);	
 	}
 }
 
@@ -41,4 +51,13 @@ void ATurpPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightdDirection, InputAxisVector.X);
 	}
+}
+
+void ATurpPlayerController::AbilityActionTrigger()
+{
+	FHitResult HitResult;
+	GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+	auto ASC = Cast<UTurpAbilitySystemComponent>(HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
+	AbilityActionTriggered.Broadcast(HitResult.Location);
+	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Purple, 	HitResult.GetActor()->GetName());
 }

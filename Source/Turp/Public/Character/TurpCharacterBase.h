@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "TurpCharacterBase.generated.h"
 
@@ -11,13 +12,14 @@ class UAttributeSet;
 class UAbilitySystemComponent;
 class UGameplayEffect;
 
-UCLASS()
-class TURP_API ATurpCharacterBase : public ACharacter
+UCLASS(Abstract)
+class TURP_API ATurpCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	ATurpCharacterBase();
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	virtual void BeginPlay() override;
