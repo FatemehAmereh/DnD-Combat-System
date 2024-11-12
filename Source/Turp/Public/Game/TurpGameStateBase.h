@@ -23,6 +23,9 @@ struct FCombatPacket
 	TArray<TObjectPtr<UAbilitySystemComponent>> TargetASCs;
 
 	UPROPERTY(BlueprintReadWrite)
+	TArray<FVector> TargetLocations;
+
+	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<UGameplayEffect> GameplayEffect;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -41,7 +44,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetCombatPacket();
 
-protected:
 	UPROPERTY(BlueprintReadWrite)
 	FCombatPacket CombatPacket;
 };

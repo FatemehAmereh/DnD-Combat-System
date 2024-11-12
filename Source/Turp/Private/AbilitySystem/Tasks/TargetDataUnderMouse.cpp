@@ -17,10 +17,10 @@ void UTargetDataUnderMouse::Activate()
 	PlayerController->AbilityActionTriggered.AddDynamic(this, &UTargetDataUnderMouse::InputCallBack);
 }
 
-void UTargetDataUnderMouse::InputCallBack(FVector Location)
+void UTargetDataUnderMouse::InputCallBack()
 {
 	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Blue, FString("FROM UTargetDataUnderMouse::InputCallBack"));
-	MouseTargetData.Broadcast(Location);
+	MouseTargetData.Broadcast();
 	EndTask();
 }
 

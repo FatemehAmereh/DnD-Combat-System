@@ -9,7 +9,7 @@
 class UInputAction;
 class UInputMappingContext;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityActionSignature, FVector, HitLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityActionSignature);
 /**
  * 
  */

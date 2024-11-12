@@ -7,8 +7,7 @@
 #include "TargetDataUnderMouse.generated.h"
 
 class ATurpPlayerController;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMouseTargetSignature, const FVector&, Data);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMouseTargetSignature);
 /**
  * 
  */
@@ -26,7 +25,7 @@ class TURP_API UTargetDataUnderMouse : public UAbilityTask
 	virtual void Activate() override;
 
 	UFUNCTION()
-	void InputCallBack(FVector Location);
+	void InputCallBack();
 
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 

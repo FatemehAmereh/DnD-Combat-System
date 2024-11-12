@@ -5,7 +5,10 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
+#include "Game/TurpGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 void ATurpPlayerController::BeginPlay()
 {
@@ -58,6 +61,10 @@ void ATurpPlayerController::AbilityActionTrigger()
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 	auto ASC = Cast<UTurpAbilitySystemComponent>(HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
-	AbilityActionTriggered.Broadcast(HitResult.Location);
+	auto GameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
+	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(GameState, ASC);
+	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(GameState, HitResult.Location);
+	
+	AbilityActionTriggered.Broadcast();
 	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Purple, 	HitResult.GetActor()->GetName());
 }
