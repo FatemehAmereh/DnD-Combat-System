@@ -29,4 +29,5 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	InitializeDefaultAttributes();
 }

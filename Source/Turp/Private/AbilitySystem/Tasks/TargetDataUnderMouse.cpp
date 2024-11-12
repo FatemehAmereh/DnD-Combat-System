@@ -4,6 +4,10 @@
 #include "AbilitySystem/Tasks/TargetDataUnderMouse.h"
 
 #include "EnhancedInputComponent.h"
+#include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
+#include "AbilitySystem/TurpAbilitySystemComponent.h"
+#include "Game/TurpGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/TurpPlayerController.h"
 
 UTargetDataUnderMouse* UTargetDataUnderMouse::GetTargetDataUnderMouse(UGameplayAbility* OwningAbility)
@@ -19,7 +23,15 @@ void UTargetDataUnderMouse::Activate()
 
 void UTargetDataUnderMouse::InputCallBack()
 {
-	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Blue, FString("FROM UTargetDataUnderMouse::InputCallBack"));
+	FHitResult HitResult;
+	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+	auto ASC = Cast<UTurpAbilitySystemComponent>(HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
+	auto GameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
+	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(GameState, ASC);
+	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(GameState, HitResult.Location);
+	
+	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Purple, 	HitResult.GetActor()->GetName());
+	
 	MouseTargetData.Broadcast();
 	EndTask();
 }

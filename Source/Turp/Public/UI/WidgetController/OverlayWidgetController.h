@@ -23,10 +23,6 @@ public:
 	UPROPERTY(BlueprintCallable)
 	FAbilityIconPress AbilityIconPressed;
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
-	TSubclassOf<UGameplayAbility> TestGameplayAbility;
-	
 private:
 	UFUNCTION()
 	void OnAbilityIconPressed(const FGameplayTag& AbilityTag);

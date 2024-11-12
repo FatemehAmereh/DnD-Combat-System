@@ -6,13 +6,20 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAttributeSet.h"
+#include "Game/TurpGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 bool UFireBoltActivationRequirement::CanApplyGameplayEffect_Implementation(const UGameplayEffect* GameplayEffect,
                                                                            const FGameplayEffectSpec& Spec, UAbilitySystemComponent* ASC) const
 {
-	// Whose ASC is that?!
-	//Spec.GetContext().GetInstigatorAbilitySystemComponent()
-	const auto AttributeSet = Cast<UTurpAttributeSet>(ASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
-	const float ACToBeat = UTurpAbilitySystemBlueprintFL::RollDN(20) + AttributeSet->GetProficiencyBonus() + AttributeSet->GetIntelligence();
-	return ACToBeat >= AttributeSet->GetArmorClass();
+	// Input ASC is for the target
+	// Spec.GetContext().GetInstigatorAbilitySystemComponent()
+	const auto AttackerASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
+	const FCombatPacket& CP = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(AttackerASC))->CombatPacket;
+	const auto AttackerAS = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	const float AbilityAC = UTurpAbilitySystemBlueprintFL::RollDN(20) + AttackerAS->GetProficiencyBonus() + AttackerAS->GetIntelligenceMod();
+	
+	const auto EnemyAS = Cast<UTurpAttributeSet>(ASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+
+	return AbilityAC >= EnemyAS->GetArmorClass();
 }

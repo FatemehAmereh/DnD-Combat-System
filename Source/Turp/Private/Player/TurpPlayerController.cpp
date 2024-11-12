@@ -58,13 +58,7 @@ void ATurpPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void ATurpPlayerController::AbilityActionTrigger()
 {
-	FHitResult HitResult;
-	GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	auto ASC = Cast<UTurpAbilitySystemComponent>(HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
-	auto GameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(GameState, ASC);
-	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(GameState, HitResult.Location);
 	
 	AbilityActionTriggered.Broadcast();
-	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Purple, 	HitResult.GetActor()->GetName());
+	
 }

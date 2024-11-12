@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
 
+#include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,4 +17,16 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 	TurpGameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 	TurpGameState->ResetCombatPacket();
 	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(TurpGameState, GameplayEffectClass);
+	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_SourceASC(TurpGameState, GetAbilitySystemComponentFromActorInfo());
+}
+
+void UTurpGameplayAbility::MakeEffect()
+{
+	
+	auto ContextHandle = TurpGameState->CombatPacket.SourceASC->MakeEffectContext();
+	ContextHandle.AddSourceObject(TurpGameState->CombatPacket.SourceASC);
+	auto spec = TurpGameState->CombatPacket.SourceASC->MakeOutgoingSpec(GameplayEffectClass, 1, ContextHandle);
+	spec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage")), -5);
+	FCombatPacket p = TurpGameState->CombatPacket;
+	TurpGameState->CombatPacket.SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TurpGameState->CombatPacket.TargetASCs[0]);
 }
