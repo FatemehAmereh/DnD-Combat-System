@@ -19,9 +19,12 @@ class TURP_API UTurpAbilitySystemBlueprintFL : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	// UI
 	UFUNCTION(BlueprintPure, Category="TurpAbilitySystemBlueprintFunctionLibrary|WidgetController" )
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
-
+	//
+	
+	// Combat Packet
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetCombatPacketParam_SourceASC(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
 
@@ -36,6 +39,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void AddCombatPacketParam_TargetHit(ATurpGameStateBase* GameState, bool Hit);
+	//
 
-	static uint8 RollDN(int N);
+	// Dice Roll
+	static uint8 DieRoll(int Count, int Type);
+	//
+
+	
 };

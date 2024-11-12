@@ -12,7 +12,7 @@ struct FGameplayEffectParams
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayAttribute Attribute;
+	FGameplayTag AttributeTag;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	uint8 DieCount;

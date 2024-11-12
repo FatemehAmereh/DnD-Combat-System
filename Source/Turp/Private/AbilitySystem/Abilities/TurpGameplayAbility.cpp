@@ -22,11 +22,10 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 
 void UTurpGameplayAbility::MakeEffect()
 {
-	
 	auto ContextHandle = TurpGameState->CombatPacket.SourceASC->MakeEffectContext();
 	ContextHandle.AddSourceObject(TurpGameState->CombatPacket.SourceASC);
 	auto spec = TurpGameState->CombatPacket.SourceASC->MakeOutgoingSpec(GameplayEffectClass, 1, ContextHandle);
-	spec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage")), -5);
+	spec.Data->SetSetByCallerMagnitude(GameplayEffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(GameplayEffectParams.DieCount, GameplayEffectParams.DieType));
 	FCombatPacket p = TurpGameState->CombatPacket;
 	TurpGameState->CombatPacket.SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TurpGameState->CombatPacket.TargetASCs[0]);
 }

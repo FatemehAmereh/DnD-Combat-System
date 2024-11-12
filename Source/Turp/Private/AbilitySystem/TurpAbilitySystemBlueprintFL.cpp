@@ -53,7 +53,12 @@ void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetHit(ATurpGameStat
 	GameState->CombatPacket.isHit.Add(Hit);
 }
 
-uint8 UTurpAbilitySystemBlueprintFL::RollDN(int N)
+uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 {
-	return UKismetMathLibrary::RandomInteger(N) + 1;
+	int DieRollResult = 0;
+	for (int i = 0; i < Count; ++i)
+	{
+		DieRollResult += UKismetMathLibrary::RandomInteger(Type) + 1;
+	}
+	return DieRollResult;
 }
