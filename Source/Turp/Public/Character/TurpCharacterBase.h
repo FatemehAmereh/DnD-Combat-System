@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "TurpCharacterBase.generated.h"
 
 class UGameplayAbility;
@@ -13,14 +14,14 @@ class UAbilitySystemComponent;
 class UGameplayEffect;
 
 UCLASS(Abstract)
-class TURP_API ATurpCharacterBase : public ACharacter, public IAbilitySystemInterface
+class TURP_API ATurpCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
 public:
 	ATurpCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	virtual FVector GetCombatSocketLocation_Implementation() override;
 protected:
 	virtual void BeginPlay() override;
 

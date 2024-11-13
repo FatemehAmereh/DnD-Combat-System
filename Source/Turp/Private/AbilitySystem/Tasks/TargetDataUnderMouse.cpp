@@ -27,8 +27,14 @@ void UTargetDataUnderMouse::InputCallBack()
 	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 	auto ASC = Cast<UTurpAbilitySystemComponent>(HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
 	auto GameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(GameState, ASC);
-	UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(GameState, HitResult.Location);
+	if(ASC)
+	{
+		UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(GameState, ASC);
+	}
+	else
+	{
+		UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(GameState, HitResult.Location);
+	}
 	
 	GEngine->AddOnScreenDebugMessage(0, 5, FColor::Purple, 	HitResult.GetActor()->GetName());
 	

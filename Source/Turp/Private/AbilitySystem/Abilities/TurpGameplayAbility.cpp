@@ -18,6 +18,8 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 	TurpGameState->ResetCombatPacket();
 	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(TurpGameState, GameplayEffectClass);
 	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_SourceASC(TurpGameState, GetAbilitySystemComponentFromActorInfo());
+	
+	GameplayEffectParams.EffectClass = GameplayEffectClass;
 }
 
 void UTurpGameplayAbility::MakeEffect()
@@ -26,6 +28,5 @@ void UTurpGameplayAbility::MakeEffect()
 	ContextHandle.AddSourceObject(TurpGameState->CombatPacket.SourceASC);
 	auto spec = TurpGameState->CombatPacket.SourceASC->MakeOutgoingSpec(GameplayEffectClass, 1, ContextHandle);
 	spec.Data->SetSetByCallerMagnitude(GameplayEffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(GameplayEffectParams.DieCount, GameplayEffectParams.DieType));
-	FCombatPacket p = TurpGameState->CombatPacket;
 	TurpGameState->CombatPacket.SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TurpGameState->CombatPacket.TargetASCs[0]);
 }

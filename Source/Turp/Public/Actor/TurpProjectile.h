@@ -17,10 +17,13 @@ class TURP_API ATurpProjectile : public AActor
 	
 public:	
 	ATurpProjectile();
-
+	void SetGameplayEffectParams(const FGameplayEffectParams& EffectParams);
 protected:
 	virtual void BeginPlay() override;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category="Projectile Setting")
+	float LifeSpan = 200.f;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 	

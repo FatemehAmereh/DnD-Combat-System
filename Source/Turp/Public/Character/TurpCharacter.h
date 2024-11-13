@@ -17,6 +17,7 @@ class TURP_API ATurpCharacter : public ATurpCharacterBase
 public:
 	ATurpCharacter();
 
+	virtual int32 GetPlayerLevel_Implementation() override;
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 	

@@ -17,7 +17,7 @@ class TURP_API AEnemyCharacter : public ATurpCharacterBase
 	AEnemyCharacter();
 
 public:
-	int32 GetPlayerLevel();
+	virtual int32 GetPlayerLevel_Implementation() override;
 	
 protected:
 	virtual void BeginPlay() override;

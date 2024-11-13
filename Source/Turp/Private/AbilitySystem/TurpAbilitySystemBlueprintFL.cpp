@@ -62,3 +62,26 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 	}
 	return DieRollResult;
 }
+
+void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState,
+	const FGameplayEffectParams& EffectParams)
+{
+	const auto SourceASC = GameState->CombatPacket.SourceASC;
+	auto ContextHandle = SourceASC->MakeEffectContext();
+	ContextHandle.AddSourceObject(SourceASC);
+	auto spec = SourceASC->MakeOutgoingSpec(EffectParams.EffectClass, 1, ContextHandle);
+	spec.Data->SetSetByCallerMagnitude(EffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(EffectParams.DieCount, EffectParams.DieType));
+	SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.TargetASCs[0]);
+}
+
+bool UTurpAbilitySystemBlueprintFL::IsATarget(const ATurpGameStateBase* GameState, AActor* OtherActor)
+{
+	for (auto TargetASC : GameState->CombatPacket.TargetASCs)
+	{
+		if(TargetASC->AbilityActorInfo->AvatarActor == OtherActor)
+		{
+			return true;
+		}
+	}
+	return false;
+}

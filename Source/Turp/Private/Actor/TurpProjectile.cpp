@@ -3,8 +3,10 @@
 
 #include "Actor/TurpProjectile.h"
 
+#include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ATurpProjectile::ATurpProjectile()
 {
@@ -24,17 +26,25 @@ ATurpProjectile::ATurpProjectile()
     ProjectileMovement->ProjectileGravityScale = 0.f;
 }
 
+void ATurpProjectile::SetGameplayEffectParams(const FGameplayEffectParams& EffectParams)
+{
+	GameplayEffectParams = EffectParams;
+}
+
 void ATurpProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetLifeSpan(LifeSpan);
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ATurpProjectile::OnSphereOverlap);
 }
 
 void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
-	
-	Destroy();
+	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
+	if(UTurpAbilitySystemBlueprintFL::IsATarget(GameState, OtherActor))
+	{
+		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, GameplayEffectParams);
+		Destroy();
+	}
 }

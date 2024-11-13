@@ -21,6 +21,12 @@ ATurpCharacter::ATurpCharacter()
 	bUseControllerRotationRoll = false; 
 }
 
+int32 ATurpCharacter::GetPlayerLevel_Implementation()
+{
+	const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>();
+	return TurpPlayerState->GetPlayerLevel();
+}
+
 void ATurpCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);

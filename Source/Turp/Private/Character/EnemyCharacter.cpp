@@ -15,7 +15,7 @@ AEnemyCharacter::AEnemyCharacter()
 	AttributeSet = CreateDefaultSubobject<UTurpAttributeSet>("AttributeSet");
 }
 
-int32 AEnemyCharacter::GetPlayerLevel()
+int32 AEnemyCharacter::GetPlayerLevel_Implementation()
 {
 	return Level;
 }

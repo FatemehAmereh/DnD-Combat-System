@@ -3,9 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/TurpGameplayAbility.h"
+#include "Game/TurpGameStateBase.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TurpAbilitySystemBlueprintFL.generated.h"
 
+struct FGameplayEffectParams;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class ATurpGameStateBase;
@@ -41,9 +45,12 @@ public:
 	static void AddCombatPacketParam_TargetHit(ATurpGameStateBase* GameState, bool Hit);
 	//
 
-	// Dice Roll
+	// Die Roll
 	static uint8 DieRoll(int Count, int Type);
 	//
 
-	
+	// Gameplay Effect
+	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayEffectParams& EffectParams);
+	static bool IsATarget(const ATurpGameStateBase* GameState, AActor* OtherActor);
+	//
 };

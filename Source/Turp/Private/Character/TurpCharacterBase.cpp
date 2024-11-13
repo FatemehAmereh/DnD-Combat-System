@@ -17,6 +17,11 @@ UAbilitySystemComponent* ATurpCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+FVector ATurpCharacterBase::GetCombatSocketLocation_Implementation()
+{
+	return GetMesh()->GetSocketLocation("AttackSocket");
+}
+
 void ATurpCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
