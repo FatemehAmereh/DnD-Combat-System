@@ -31,6 +31,16 @@ void ATurpProjectile::SetGameplayEffectParams(const FGameplayEffectParams& Effec
 	GameplayEffectParams = EffectParams;
 }
 
+void ATurpProjectile::DisableOverlap()
+{
+	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+}
+
+void ATurpProjectile::SetTargetASC(UAbilitySystemComponent* ASC)
+{
+	TargetASC = ASC;
+}
+
 void ATurpProjectile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,7 +52,7 @@ void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-	if(UTurpAbilitySystemBlueprintFL::IsATarget(GameState, OtherActor))
+	if(OtherActor == TargetASC->GetAvatarActor())
 	{
 		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, GameplayEffectParams);
 		Destroy();

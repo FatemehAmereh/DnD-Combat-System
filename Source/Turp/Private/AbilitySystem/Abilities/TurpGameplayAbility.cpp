@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "Game/TurpGameStateBase.h"
+#include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
@@ -22,11 +23,7 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 	GameplayEffectParams.EffectClass = GameplayEffectClass;
 }
 
-void UTurpGameplayAbility::MakeEffect()
-{
-	auto ContextHandle = TurpGameState->CombatPacket.SourceASC->MakeEffectContext();
-	ContextHandle.AddSourceObject(TurpGameState->CombatPacket.SourceASC);
-	auto spec = TurpGameState->CombatPacket.SourceASC->MakeOutgoingSpec(GameplayEffectClass, 1, ContextHandle);
-	spec.Data->SetSetByCallerMagnitude(GameplayEffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(GameplayEffectParams.DieCount, GameplayEffectParams.DieType));
-	TurpGameState->CombatPacket.SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TurpGameState->CombatPacket.TargetASCs[0]);
-}
+// void UTurpGameplayAbility::FaceTargetBeforeAttacking()
+// {
+// 	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(),);
+// }

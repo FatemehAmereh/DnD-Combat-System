@@ -30,20 +30,14 @@ void UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_SourceASC(ATurpGameStat
 	GameState->CombatPacket.SourceASC = ASC;
 }
 
-void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetASC(ATurpGameStateBase* GameState,
-	UAbilitySystemComponent* ASC)
+void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_Targets(ATurpGameStateBase* GameState,
+	FTurpAbilityTargetData TargetData)
 {
-	GameState->CombatPacket.TargetASCs.Add(ASC);
-}
-
-void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetLocation(ATurpGameStateBase* GameState,
-	FVector Location)
-{
-	GameState->CombatPacket.TargetLocations.Add(Location);
+	GameState->CombatPacket.Targets.Add(TargetData);
 }
 
 void UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(ATurpGameStateBase* GameState,
-	TSubclassOf<UGameplayEffect> GE)
+                                                                        TSubclassOf<UGameplayEffect> GE)
 {
 	GameState->CombatPacket.GameplayEffect = GE;
 }
@@ -71,17 +65,7 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 	ContextHandle.AddSourceObject(SourceASC);
 	auto spec = SourceASC->MakeOutgoingSpec(EffectParams.EffectClass, 1, ContextHandle);
 	spec.Data->SetSetByCallerMagnitude(EffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(EffectParams.DieCount, EffectParams.DieType));
-	SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.TargetASCs[0]);
-}
-
-bool UTurpAbilitySystemBlueprintFL::IsATarget(const ATurpGameStateBase* GameState, AActor* OtherActor)
-{
-	for (auto TargetASC : GameState->CombatPacket.TargetASCs)
-	{
-		if(TargetASC->AbilityActorInfo->AvatarActor == OtherActor)
-		{
-			return true;
-		}
-	}
-	return false;
+	
+	// TODO: Change based on mutliple targets
+	SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.Targets[0].ASC);
 }

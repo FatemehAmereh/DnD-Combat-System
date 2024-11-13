@@ -21,7 +21,6 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile();
-
-private:
+	
 	FVector FindTargetLocation() const;
 };

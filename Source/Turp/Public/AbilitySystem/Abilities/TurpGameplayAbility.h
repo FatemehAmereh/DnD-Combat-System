@@ -39,9 +39,8 @@ class TURP_API UTurpGameplayAbility : public UGameplayAbility
 protected:
 	// Set the combat packet values: SourceASC and GameplayEffectClass
 	virtual void PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) override;
-	
-	UFUNCTION(BlueprintCallable)
-	void MakeEffect();
+
+	//virtual void FaceTargetBeforeAttacking();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Effect Parameters")
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;

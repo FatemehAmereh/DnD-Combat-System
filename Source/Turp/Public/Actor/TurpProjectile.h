@@ -18,6 +18,8 @@ class TURP_API ATurpProjectile : public AActor
 public:	
 	ATurpProjectile();
 	void SetGameplayEffectParams(const FGameplayEffectParams& EffectParams);
+	void DisableOverlap();
+	void SetTargetASC(UAbilitySystemComponent* ASC);
 protected:
 	virtual void BeginPlay() override;
 	
@@ -35,4 +37,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+	TObjectPtr<UAbilitySystemComponent> TargetASC;
 };

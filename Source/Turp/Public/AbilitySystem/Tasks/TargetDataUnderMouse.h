@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
+#include "Game/TurpGameStateBase.h"
 #include "TargetDataUnderMouse.generated.h"
 
 class ATurpPlayerController;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMouseTargetSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMouseTargetSignature, FTurpAbilityTargetData, TargetData);
 /**
  * 
  */

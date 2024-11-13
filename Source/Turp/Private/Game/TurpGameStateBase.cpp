@@ -6,8 +6,7 @@
 void ATurpGameStateBase::ResetCombatPacket()
 {
 	CombatPacket.SourceASC = nullptr;
-	CombatPacket.TargetASCs.Empty();
-	CombatPacket.TargetLocations.Empty();
+	CombatPacket.Targets.Empty();
 	CombatPacket.GameplayEffect = nullptr;
 	CombatPacket.isHit.Empty();
 }

@@ -12,8 +12,22 @@ void UFireBolt::SpawnProjectile()
 {
 	if(const auto CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 	{
+		// Find Target
+		FVector TargetLocation = FVector::Zero();
+		bool DisableOverlap = false;
+		const auto TargetData = TurpGameState->CombatPacket.Targets[0];
+		if(TargetData.ASC)
+		{
+			TargetLocation = TargetData.ASC->AbilityActorInfo->AvatarActor->GetActorLocation();
+		}
+		else
+		{
+			TargetLocation =  TargetData.Location;
+			DisableOverlap = true;
+		}
+		//
+		
 		const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
-		const FVector TargetLocation = FindTargetLocation();
 		const FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
 
 		FTransform SpawnTransform;
@@ -29,6 +43,14 @@ void UFireBolt::SpawnProjectile()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		Projectile->SetGameplayEffectParams(GameplayEffectParams);
+		if(DisableOverlap)
+		{
+			Projectile->DisableOverlap();
+		}
+		else
+		{
+			Projectile->SetTargetASC(TargetData.ASC);
+		}
 		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
@@ -36,9 +58,10 @@ void UFireBolt::SpawnProjectile()
 
 FVector UFireBolt::FindTargetLocation() const
 {
-	if(!TurpGameState->CombatPacket.TargetASCs.IsEmpty())
+	const auto TargetData = TurpGameState->CombatPacket.Targets[0];
+	if(TargetData.ASC)
 	{
-		return TurpGameState->CombatPacket.TargetASCs[0]->AbilityActorInfo->AvatarActor->GetActorLocation();
+		return TargetData.ASC->AbilityActorInfo->AvatarActor->GetActorLocation();
 	}
-	return TurpGameState->CombatPacket.TargetLocations[0];
+	return TargetData.Location;
 }

@@ -33,10 +33,7 @@ public:
 	static void SetCombatPacketParam_SourceASC(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void AddCombatPacketParam_TargetASC(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
-
-	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void AddCombatPacketParam_TargetLocation(ATurpGameStateBase* GameState, FVector Location);
+	static void AddCombatPacketParam_Targets(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetCombatPacketParam_GameplayEffect(ATurpGameStateBase* GameState, TSubclassOf<UGameplayEffect> GE);
@@ -51,6 +48,5 @@ public:
 
 	// Gameplay Effect
 	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayEffectParams& EffectParams);
-	static bool IsATarget(const ATurpGameStateBase* GameState, AActor* OtherActor);
 	//
 };

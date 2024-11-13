@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	FVector GetCombatSocketLocation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void FaceTarget(FVector TargetLocation);
 };
