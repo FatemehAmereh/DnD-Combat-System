@@ -42,11 +42,6 @@ void UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(ATurpGam
 	GameState->CombatPacket.GameplayEffect = GE;
 }
 
-void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_TargetHit(ATurpGameStateBase* GameState, bool Hit)
-{
-	GameState->CombatPacket.isHit.Add(Hit);
-}
-
 uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 {
 	int DieRollResult = 0;
