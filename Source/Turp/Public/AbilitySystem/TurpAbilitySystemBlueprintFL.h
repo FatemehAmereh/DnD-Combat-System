@@ -37,9 +37,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetCombatPacketParam_GameplayEffect(ATurpGameStateBase* GameState, TSubclassOf<UGameplayEffect> GE);
-
-	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void AddCombatPacketParam_TargetHit(ATurpGameStateBase* GameState, bool Hit);
 	//
 
 	// Die Roll

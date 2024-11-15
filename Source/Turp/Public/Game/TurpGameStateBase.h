@@ -33,18 +33,9 @@ struct FCombatPacket
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FTurpAbilityTargetData> Targets;
-	
-	// UPROPERTY(BlueprintReadWrite)
-	// TArray<TObjectPtr<UAbilitySystemComponent>> TargetASCs;
-	//
-	// UPROPERTY(BlueprintReadWrite)
-	// TArray<FVector> TargetLocations;
 
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<UGameplayEffect> GameplayEffect;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<bool> isHit;
 };
 
 /**
