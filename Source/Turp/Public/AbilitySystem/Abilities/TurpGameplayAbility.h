@@ -40,7 +40,12 @@ protected:
 	// Set the combat packet values: SourceASC and GameplayEffectClass
 	virtual void PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) override;
 
-	//virtual void FaceTargetBeforeAttacking();
+	// Face the ability owner towards the target before starting attack initiates.
+	UFUNCTION(BlueprintCallable)
+	virtual void FaceTargetBeforeAttacking();
+
+	// Return the first target in the current combat packet.
+	virtual FVector FindTargetToFaceTowards();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Effect Parameters")
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;

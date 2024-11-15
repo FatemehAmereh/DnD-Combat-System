@@ -23,7 +23,23 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 	GameplayEffectParams.EffectClass = GameplayEffectClass;
 }
 
-// void UTurpGameplayAbility::FaceTargetBeforeAttacking()
-// {
-// 	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(),);
-// }
+void UTurpGameplayAbility::FaceTargetBeforeAttacking()
+{
+	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(), FindTargetToFaceTowards());
+}
+
+FVector UTurpGameplayAbility::FindTargetToFaceTowards()
+{
+	if(!TurpGameState->CombatPacket.Targets.IsEmpty())
+	{
+		if(TurpGameState->CombatPacket.Targets[0].ASC)
+		{
+			return TurpGameState->CombatPacket.Targets[0].ASC->GetAvatarActor()->GetActorLocation();
+		}
+		else
+		{
+			return TurpGameState->CombatPacket.Targets[0].Location;
+		}
+	}
+	return FVector::Zero();
+}
