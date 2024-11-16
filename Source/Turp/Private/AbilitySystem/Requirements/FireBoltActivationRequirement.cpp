@@ -12,8 +12,21 @@
 bool UFireBoltActivationRequirement::CanApplyGameplayEffect_Implementation(const UGameplayEffect* GameplayEffect,
                                                                            const FGameplayEffectSpec& Spec, UAbilitySystemComponent* ASC) const
 {
-	// Input ASC is for the target
-	// Spec.GetContext().GetInstigatorAbilitySystemComponent()
+	// Input ASC is for the target.
+
+	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(ASC));
+	const auto& AbilityProperties = GameState->CombatPacket.AbilityProperties;
+
+	// Damage Type Ability: Make attak roll
+	if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
+	{
+		// Check advantage/disadvantage here.
+		if(AbilityProperties.Damage.Save)
+		{
+			
+		}
+	}
+	
 	const auto AttackerASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
 	const FCombatPacket& CP = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(AttackerASC))->CombatPacket;
 	const auto AttackerAS = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));

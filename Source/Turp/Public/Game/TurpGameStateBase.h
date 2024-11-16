@@ -49,7 +49,7 @@ struct FAbilityDamageProperties
 	void Reset()
 	{
 		Save = false;
-		DamageTypeTag = FGameplayTag::EmptyTag;
+		SavingThrowTag = FGameplayTag::EmptyTag;
 		ModifierTag =FGameplayTag::EmptyTag;
 		Dice = FDice();
 	}
@@ -58,7 +58,7 @@ struct FAbilityDamageProperties
 	bool Save;
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayTag DamageTypeTag;
+	FGameplayTag SavingThrowTag;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FDice Dice;
@@ -75,11 +75,15 @@ struct FAbilityConditionProperties
 	void Reset()
 	{
 		Save = false;
+		SavingThrowTag = FGameplayTag::EmptyTag;
 		TagsToGrant.Empty();
 	}
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	bool Save;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag SavingThrowTag;
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	TArray<FGameplayTag> TagsToGrant;
