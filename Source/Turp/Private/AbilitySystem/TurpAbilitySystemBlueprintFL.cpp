@@ -4,6 +4,8 @@
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "TurpTagsManager.h"
+#include "AbilitySystem/TurpAttributeSet.h"
 #include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -53,15 +55,68 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 	return DieRollResult;
 }
 
-void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState,
-	const FGameplayAbilityProperties& EffectParams)
+void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
-	const auto SourceASC = GameState->CombatPacket.SourceASC;
-	auto ContextHandle = SourceASC->MakeEffectContext();
-	ContextHandle.AddSourceObject(SourceASC);
-	auto spec = SourceASC->MakeOutgoingSpec(EffectParams.EffectClass, 1, ContextHandle);
-	spec.Data->SetSetByCallerMagnitude(EffectParams.Damage.ModifierTag, -UTurpAbilitySystemBlueprintFL::DieRoll(EffectParams.Damage.Dice.Count, EffectParams.Damage.Dice.Type));
+	FString DebugMsg = "";
+	// Requirement check here.
+	const auto& GameplayTags = FTurpTagsManager::Get();
+	const FCombatPacket& CP = GameState->CombatPacket;
+	const auto& AbilityProperties = CP.AbilityProperties;
+	const auto TargetASC = CP.Targets[TargetIndex].ASC;
+	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	
-	// TODO: Change based on mutliple targets
-	SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.Targets[0].ASC);
+	// Ability does damage. Do attack roll or saving throw
+	if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
+	{
+		bool ApplyEffect = true;
+		
+		// TODO: Check advantage/disadvantage here.
+		uint8 DamageRoll = UTurpAbilitySystemBlueprintFL::DieRoll(AbilityProperties.Damage.Dice.Count, AbilityProperties.Damage.Dice.Type);
+		if(AbilityProperties.Damage.NeedsSavingThrow)
+		{
+			uint8 SaveRoll = UTurpAbilitySystemBlueprintFL::DieRoll(1, 20);
+			if(AbilityProperties.Damage.SavingThrowTag == GameplayTags.SavingThrow_Strength)
+			{
+				SaveRoll += TargetAttributeSet->GetStrengthST();
+			}
+			DebugMsg += FString::Printf(TEXT("SavingThrow: %d > %f\n"), SaveRoll, SourceAttributeSet->GetSpellSaveDC()); 
+			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
+			{
+				// Saving throw success.
+				if(AbilityProperties.Damage.TakeHalfDamageOnSuccess)
+				{
+					DamageRoll /= 2.f;
+				}
+				else
+				{
+					ApplyEffect = false;
+				}
+			}
+		}
+		else
+		{
+			uint8 AttackRoll = UTurpAbilitySystemBlueprintFL::DieRoll(1, 20);
+			AttackRoll += SourceAttributeSet->GetProficiencyBonus() + SourceAttributeSet->GetIntelligenceMod();
+			DebugMsg += FString::Printf(TEXT("AttackRoll: %f > %d\n"), TargetAttributeSet->GetArmorClass(), AttackRoll); 
+			if(TargetAttributeSet->GetArmorClass() > AttackRoll)
+			{
+				// Miss!
+				ApplyEffect = false;
+			}
+		}
+		
+		if(ApplyEffect)
+		{
+			DebugMsg += FString::Printf(TEXT("Damage: %d\n"), DamageRoll);
+			const auto SourceASC = GameState->CombatPacket.SourceASC;
+			auto ContextHandle = SourceASC->MakeEffectContext();
+			ContextHandle.AddSourceObject(SourceASC);
+			auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
+			spec.Data->SetSetByCallerMagnitude(AbilityProperties.Damage.ModifierTag, -DamageRoll);
+	
+			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.Targets[0].ASC);
+		}
+		GEngine->AddOnScreenDebugMessage(0, 10, FColor::Blue, DebugMsg);
+	}
 }

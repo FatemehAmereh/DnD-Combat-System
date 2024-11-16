@@ -46,6 +46,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, WisdomST);
 	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, CharismaST);
 	
+	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, Initiative);
+	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, SpellSaveDC);
+
+	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, Health);
+	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, MaxHealth);
+	
 protected:
 // Primary Attributes
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Primary")
@@ -116,20 +122,16 @@ protected:
 // Secondary Attributes
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Secondary")
 	FGameplayAttributeData Initiative;
-	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, Initiative);
 
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Secondary")
 	FGameplayAttributeData SpellSaveDC;
-	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, SpellSaveDC);
 //
 
 // Vital Attributes
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Vital")
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, Health);
 
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Vital")
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UTurpAttributeSet, MaxHealth);
 //
 };

@@ -48,14 +48,18 @@ struct FAbilityDamageProperties
 
 	void Reset()
 	{
-		Save = false;
+		NeedsSavingThrow = false;
+		TakeHalfDamageOnSuccess = false;
 		SavingThrowTag = FGameplayTag::EmptyTag;
 		ModifierTag =FGameplayTag::EmptyTag;
 		Dice = FDice();
 	}
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	bool Save;
+	bool NeedsSavingThrow;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool TakeHalfDamageOnSuccess;
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FGameplayTag SavingThrowTag;
@@ -74,13 +78,13 @@ struct FAbilityConditionProperties
 
 	void Reset()
 	{
-		Save = false;
+		NeedsSavingThrow = false;
 		SavingThrowTag = FGameplayTag::EmptyTag;
 		TagsToGrant.Empty();
 	}
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	bool Save;
+	bool NeedsSavingThrow;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FGameplayTag SavingThrowTag;

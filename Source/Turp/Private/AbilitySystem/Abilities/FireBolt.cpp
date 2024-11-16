@@ -42,7 +42,7 @@ void UFireBolt::SpawnProjectile()
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		Projectile->SetGameplayAbilityProperties(GameplayAbilityProperties);
+		Projectile->SetTargetIndex(0);
 		if(DisableOverlap)
 		{
 			Projectile->DisableOverlap();

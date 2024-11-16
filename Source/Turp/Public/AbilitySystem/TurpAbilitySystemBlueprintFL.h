@@ -44,6 +44,6 @@ public:
 	//
 
 	// Gameplay Effect
-	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayAbilityProperties& EffectParams);
+	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
 	//
 };

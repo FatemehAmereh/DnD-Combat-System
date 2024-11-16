@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 
+#include "TurpTagsManager.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAttributeSet.h"
@@ -13,27 +14,40 @@ bool UFireBoltActivationRequirement::CanApplyGameplayEffect_Implementation(const
                                                                            const FGameplayEffectSpec& Spec, UAbilitySystemComponent* ASC) const
 {
 	// Input ASC is for the target.
+	// const auto& GameplayTags = FTurpTagsManager::Get();
+	// const FCombatPacket& CP = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(ASC))->CombatPacket;
+	// const auto& AbilityProperties = CP.AbilityProperties;
+	// const auto TargetAttributeSet = Cast<UTurpAttributeSet>(ASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	// const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	//
+	// // Ability does damage.
+	// if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
+	// {
+	// 	// TODO: Check advantage/disadvantage here.
+	// 	bool TargetSaved = false;
+	// 	if(AbilityProperties.Damage.NeedsSavingThrow)
+	// 	{
+	// 		uint8 SaveRoll = UTurpAbilitySystemBlueprintFL::DieRoll(1, 20);
+	// 		if(AbilityProperties.Damage.SavingThrowTag == GameplayTags.SavingThrow_Strength)
+	// 		{
+	// 			SaveRoll += TargetAttributeSet->GetStrengthST();
+	// 		}
+	// 		
+	// 		if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
+	// 		{
+	// 			TargetSaved = true;
+	// 		}
+	// 	}
 
-	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(ASC));
-	const auto& AbilityProperties = GameState->CombatPacket.AbilityProperties;
-
-	// Damage Type Ability: Make attak roll
-	if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
-	{
-		// Check advantage/disadvantage here.
-		if(AbilityProperties.Damage.Save)
-		{
-			
-		}
-	}
-	
-	const auto AttackerASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
-	const FCombatPacket& CP = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(AttackerASC))->CombatPacket;
-	const auto AttackerAS = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
-	const float AbilityAC = UTurpAbilitySystemBlueprintFL::DieRoll(1, 20) + AttackerAS->GetProficiencyBonus() + AttackerAS->GetIntelligenceMod();
-	
-	const auto EnemyAS = Cast<UTurpAttributeSet>(ASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
-
-	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Orange, FString::Printf(TEXT("AbilityAC: %f >= EnemyAC: %f"), AbilityAC, EnemyAS->GetArmorClass()));
-	return AbilityAC >= EnemyAS->GetArmorClass();
+		// // Roll Damage
+		// if(!TargetSaved || (TargetSaved && AbilityProperties.Damage.TakeHalfDamageOnSave))
+		// {
+		// 	uint8 DamageRoll = UTurpAbilitySystemBlueprintFL::DieRoll(AbilityProperties.Damage.Dice.Count, AbilityProperties.Damage.Dice.Type);
+		// 	if(TargetSaved && AbilityProperties.Damage.TakeHalfDamageOnSave)
+		// 	{
+		// 		DamageRoll /= 2.f;
+		// 	}
+		// }
+	//}
+	return true;
 }
