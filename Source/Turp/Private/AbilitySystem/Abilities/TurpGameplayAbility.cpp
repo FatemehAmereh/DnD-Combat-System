@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
+#include "AbilitySystem/Tasks/TargetDataUnderMouse.h"
 #include "Game/TurpGameStateBase.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,16 +18,15 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 
 	TurpGameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 	TurpGameState->ResetCombatPacket();
-	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(TurpGameState, GameplayEffectClass);
-	UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_SourceASC(TurpGameState, GetAbilitySystemComponentFromActorInfo());
-	
-	GameplayEffectParams.EffectClass = GameplayEffectClass;
+	UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(TurpGameState, GetAbilitySystemComponentFromActorInfo());
+	UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(TurpGameState, GameplayAbilityProperties);
 }
 
 void UTurpGameplayAbility::FaceTargetBeforeAttacking()
 {
 	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(), FindTargetToFaceTowards());
 }
+
 
 FVector UTurpGameplayAbility::FindTargetToFaceTowards()
 {

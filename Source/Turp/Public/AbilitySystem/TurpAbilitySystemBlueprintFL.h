@@ -9,7 +9,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TurpAbilitySystemBlueprintFL.generated.h"
 
-struct FGameplayEffectParams;
+struct FGameplayAbilityProperties;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class ATurpGameStateBase;
@@ -30,13 +30,13 @@ public:
 	
 	// Combat Packet
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void SetCombatPacketParam_SourceASC(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
+	static void SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void AddCombatPacketParam_Targets(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
+	static void AddTargetForCombatPacket(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
-	static void SetCombatPacketParam_GameplayEffect(ATurpGameStateBase* GameState, TSubclassOf<UGameplayEffect> GE);
+	static void SetGameplayAbilityPropertiesForCombatPacket(ATurpGameStateBase* GameState, const FGameplayAbilityProperties& AbilityProperties);
 	//
 
 	// Die Roll
@@ -44,6 +44,6 @@ public:
 	//
 
 	// Gameplay Effect
-	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayEffectParams& EffectParams);
+	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayAbilityProperties& EffectParams);
 	//
 };

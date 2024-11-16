@@ -4,6 +4,7 @@
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -25,21 +26,21 @@ UOverlayWidgetController* UTurpAbilitySystemBlueprintFL::GetOverlayWidgetControl
 	return nullptr;
 }
 
-void UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_SourceASC(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC)
+void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC)
 {
 	GameState->CombatPacket.SourceASC = ASC;
 }
 
-void UTurpAbilitySystemBlueprintFL::AddCombatPacketParam_Targets(ATurpGameStateBase* GameState,
+void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase* GameState,
 	FTurpAbilityTargetData TargetData)
 {
 	GameState->CombatPacket.Targets.Add(TargetData);
 }
 
-void UTurpAbilitySystemBlueprintFL::SetCombatPacketParam_GameplayEffect(ATurpGameStateBase* GameState,
-                                                                        TSubclassOf<UGameplayEffect> GE)
+void UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(ATurpGameStateBase* GameState,
+	const FGameplayAbilityProperties& AbilityProperties)
 {
-	GameState->CombatPacket.GameplayEffect = GE;
+	GameState->CombatPacket.AbilityProperties = AbilityProperties;
 }
 
 uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
@@ -53,13 +54,13 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 }
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState,
-	const FGameplayEffectParams& EffectParams)
+	const FGameplayAbilityProperties& EffectParams)
 {
 	const auto SourceASC = GameState->CombatPacket.SourceASC;
 	auto ContextHandle = SourceASC->MakeEffectContext();
 	ContextHandle.AddSourceObject(SourceASC);
 	auto spec = SourceASC->MakeOutgoingSpec(EffectParams.EffectClass, 1, ContextHandle);
-	spec.Data->SetSetByCallerMagnitude(EffectParams.AttributeTag, -UTurpAbilitySystemBlueprintFL::DieRoll(EffectParams.DieCount, EffectParams.DieType));
+	spec.Data->SetSetByCallerMagnitude(EffectParams.Damage.ModifierTag, -UTurpAbilitySystemBlueprintFL::DieRoll(EffectParams.Damage.Dice.Count, EffectParams.Damage.Dice.Type));
 	
 	// TODO: Change based on mutliple targets
 	SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.Targets[0].ASC);

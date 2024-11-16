@@ -3,13 +3,31 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Containers/Union.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/GameStateBase.h"
 #include "TurpGameStateBase.generated.h"
 
 class UGameplayAbility;
 class UAbilitySystemComponent;
 class UGameplayEffect;
+
+USTRUCT(BlueprintType)
+struct FDice
+{
+	GENERATED_BODY()
+
+	void Reset()
+	{
+		Count = 0;
+		Type = 0;
+	}
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 Count;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 Type;
+};
 
 USTRUCT(BlueprintType)
 struct FTurpAbilityTargetData
@@ -21,6 +39,98 @@ struct FTurpAbilityTargetData
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector Location;
+};
+
+USTRUCT(BlueprintType)
+struct FAbilityDamageProperties
+{
+	GENERATED_BODY()
+
+	void Reset()
+	{
+		Save = false;
+		DamageTypeTag = FGameplayTag::EmptyTag;
+		ModifierTag =FGameplayTag::EmptyTag;
+		Dice = FDice();
+	}
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool Save;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag DamageTypeTag;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FDice Dice;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag ModifierTag;
+};
+
+USTRUCT(BlueprintType)
+struct FAbilityConditionProperties
+{
+	GENERATED_BODY()
+
+	void Reset()
+	{
+		Save = false;
+		TagsToGrant.Empty();
+	}
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool Save;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TArray<FGameplayTag> TagsToGrant;
+};
+
+USTRUCT(BlueprintType)
+struct FOtherAbilityProperties
+{
+	GENERATED_BODY()
+
+	void Reset()
+	{
+		ModifierMagnitude = 0;
+		ModifierTag = FGameplayTag::EmptyTag;
+	}
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int ModifierMagnitude;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag ModifierTag;
+};
+
+USTRUCT(BlueprintType)
+struct FGameplayAbilityProperties
+{
+	GENERATED_BODY()
+
+	void Reset()
+	{
+		EffectClass = nullptr;
+		TargetCount = 0;
+		Damage.Reset();
+		Condition.Reset();
+		OtherAttributeChanges.Reset();
+	}
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> EffectClass;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int TargetCount;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FAbilityDamageProperties Damage;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FAbilityConditionProperties Condition;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FOtherAbilityProperties OtherAttributeChanges;
 };
 
 USTRUCT(Blueprintable, BlueprintType)
@@ -35,7 +145,7 @@ struct FCombatPacket
 	TArray<FTurpAbilityTargetData> Targets;
 
 	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<UGameplayEffect> GameplayEffect;
+	FGameplayAbilityProperties AbilityProperties;
 };
 
 /**

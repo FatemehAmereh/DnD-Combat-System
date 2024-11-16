@@ -17,7 +17,7 @@ class TURP_API ATurpProjectile : public AActor
 	
 public:	
 	ATurpProjectile();
-	void SetGameplayEffectParams(const FGameplayEffectParams& EffectParams);
+	void SetGameplayAbilityProperties(const FGameplayAbilityProperties& AbilityProperties);
 	void DisableOverlap();
 	void SetTargetASC(UAbilitySystemComponent* ASC);
 protected:
@@ -33,7 +33,7 @@ protected:
 	TObjectPtr<USphereComponent> Sphere;
 
 	UPROPERTY(BlueprintReadWrite, Category="Gameplay Effect Settings")
-	FGameplayEffectParams GameplayEffectParams;
+	FGameplayAbilityProperties GameplayAbilityProperties;
 
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

@@ -26,9 +26,9 @@ ATurpProjectile::ATurpProjectile()
     ProjectileMovement->ProjectileGravityScale = 0.f;
 }
 
-void ATurpProjectile::SetGameplayEffectParams(const FGameplayEffectParams& EffectParams)
+void ATurpProjectile::SetGameplayAbilityProperties(const FGameplayAbilityProperties& AbilityProperties)
 {
-	GameplayEffectParams = EffectParams;
+	GameplayAbilityProperties = AbilityProperties;
 }
 
 void ATurpProjectile::DisableOverlap()
@@ -54,7 +54,7 @@ void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 	if(OtherActor == TargetASC->GetAvatarActor())
 	{
-		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, GameplayEffectParams);
+		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, GameplayAbilityProperties);
 		Destroy();
 	}
 }
