@@ -19,6 +19,7 @@ struct FTurpTagsManager
 	// Ability
 	FGameplayTag Ability_FireBolt;
 	FGameplayTag Ability_ScorchingRay;
+	FGameplayTag Ability_BurningHands;
 private:
 	static FTurpTagsManager GameplayTags;
 };

@@ -19,4 +19,7 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 	
 	GameplayTags.Ability_ScorchingRay = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Ability.ScorchingRay"));
+
+	GameplayTags.Ability_BurningHands = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.BurningHands"));
 }
