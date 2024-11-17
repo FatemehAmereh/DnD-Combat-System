@@ -37,7 +37,6 @@ void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBa
 void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase* GameState,
 	FTurpAbilityTargetData TargetData)
 {
-	UE_LOG(Turp, Log, TEXT("Your log message goes here."));
 	GameState->CombatPacket.Targets.Add(TargetData);
 }
 
@@ -59,7 +58,6 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
-	FString DebugMsg = "";
 	// Requirement check here.
 	const auto& GameplayTags = FTurpTagsManager::Get();
 	const FCombatPacket& CP = GameState->CombatPacket;
@@ -67,6 +65,7 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 	const auto TargetASC = CP.Targets[TargetIndex].ASC;
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	FString DebugMsg = "";
 	
 	// Ability does damage. Do attack roll or saving throw
 	if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
@@ -82,10 +81,11 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 			{
 				SaveRoll += TargetAttributeSet->GetStrengthST();
 			}
-			DebugMsg += FString::Printf(TEXT("SavingThrow: %d > %f\n"), SaveRoll, SourceAttributeSet->GetSpellSaveDC()); 
+
 			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
 			{
 				// Saving throw success.
+				DebugMsg += TEXT("SavingThrow succeded! ");
 				if(AbilityProperties.Damage.TakeHalfDamageOnSuccess)
 				{
 					DamageRoll /= 2.f;
@@ -95,22 +95,33 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 					ApplyEffect = false;
 				}
 			}
+			else
+			{
+				DebugMsg += TEXT("SavingThrow Failed! ");
+			}
+			DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d "), StaticCast<int>(SourceAttributeSet->GetSpellSaveDC()), SaveRoll);
 		}
 		else
 		{
 			uint8 AttackRoll = UTurpAbilitySystemBlueprintFL::DieRoll(1, 20);
 			AttackRoll += SourceAttributeSet->GetProficiencyBonus() + SourceAttributeSet->GetIntelligenceMod();
-			DebugMsg += FString::Printf(TEXT("AttackRoll: %f > %d\n"), TargetAttributeSet->GetArmorClass(), AttackRoll); 
+
 			if(TargetAttributeSet->GetArmorClass() > AttackRoll)
 			{
 				// Miss!
+				DebugMsg += TEXT("Attack Miss! ");
 				ApplyEffect = false;
 			}
+			else
+			{
+				DebugMsg += TEXT("Attack Hit! ");
+			}
+			DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d "), StaticCast<int>(TargetAttributeSet->GetArmorClass()), AttackRoll);
 		}
 		
 		if(ApplyEffect)
 		{
-			DebugMsg += FString::Printf(TEXT("Damage: %d\n"), DamageRoll);
+			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), AbilityProperties.Damage.Dice.Count, AbilityProperties.Damage.Dice.Type, DamageRoll);
 			const auto SourceASC = GameState->CombatPacket.SourceASC;
 			auto ContextHandle = SourceASC->MakeEffectContext();
 			ContextHandle.AddSourceObject(SourceASC);
@@ -120,5 +131,6 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, GameState->CombatPacket.Targets[0].ASC);
 		}
 		GEngine->AddOnScreenDebugMessage(0, 10, FColor::Blue, DebugMsg);
+		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
-}
+}	
