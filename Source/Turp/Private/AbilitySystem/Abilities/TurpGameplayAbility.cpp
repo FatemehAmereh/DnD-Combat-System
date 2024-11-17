@@ -20,7 +20,8 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
                                        FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
+	
+	TargetsReceived = 0;
 	TurpGameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 	TurpGameState->ResetCombatPacket();
 	UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(TurpGameState, GetAbilitySystemComponentFromActorInfo());

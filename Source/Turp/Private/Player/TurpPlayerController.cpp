@@ -36,7 +36,7 @@ void ATurpPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATurpPlayerController::Move);	
-		EnhancedInputComponent->BindAction(AbilityAction, ETriggerEvent::Triggered, this, &ATurpPlayerController::AbilityActionTrigger);	
+		EnhancedInputComponent->BindAction(AbilityAction, ETriggerEvent::Started, this, &ATurpPlayerController::AbilityActionTrigger);	
 	}
 }
 

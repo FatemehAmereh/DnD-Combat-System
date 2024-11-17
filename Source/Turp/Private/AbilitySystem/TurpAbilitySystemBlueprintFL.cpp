@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "TurpTagsManager.h"
+#include "TurpUtilities.h"
 #include "AbilitySystem/TurpAttributeSet.h"
 #include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 #include "Game/TurpGameStateBase.h"
@@ -36,6 +37,7 @@ void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBa
 void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase* GameState,
 	FTurpAbilityTargetData TargetData)
 {
+	UE_LOG(Turp, Log, TEXT("Your log message goes here."));
 	GameState->CombatPacket.Targets.Add(TargetData);
 }
 
