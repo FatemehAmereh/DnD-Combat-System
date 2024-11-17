@@ -10,6 +10,11 @@
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 
+FGameplayTag UTurpGameplayAbility::GetAbilityTag() const
+{
+	return AbilityTag;
+}
+
 void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
                                        const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
                                        FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)

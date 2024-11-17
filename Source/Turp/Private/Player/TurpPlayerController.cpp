@@ -58,7 +58,5 @@ void ATurpPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void ATurpPlayerController::AbilityActionTrigger()
 {
-	
 	AbilityActionTriggered.Broadcast();
-	
 }

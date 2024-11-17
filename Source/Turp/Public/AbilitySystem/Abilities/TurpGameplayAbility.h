@@ -16,6 +16,9 @@ class TURP_API UTurpGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
+public:
+	FGameplayTag GetAbilityTag() const;
+	
 protected:
 	// Set the combat packet values: SourceASC and GameplayEffectClass
 	virtual void PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) override;
@@ -29,7 +32,13 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability Settings")
 	FGameplayAbilityProperties GameplayAbilityProperties;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability Settings")
+	FGameplayTag AbilityTag;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ATurpGameStateBase> TurpGameState;
+
+	UPROPERTY(BlueprintReadWrite, Category="Target")
+	int TargetsReceived = 0;
 };

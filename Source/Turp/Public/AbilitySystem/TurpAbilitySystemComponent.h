@@ -16,5 +16,5 @@ class TURP_API UTurpAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 	void ActivateGameplayAbility(const FGameplayTag& AbilityTag);
-	void AddCharacterAbility(TSubclassOf<UGameplayAbility> AbilityClass);
+	void AddCharacterAbility(const TSubclassOf<UGameplayAbility>& AbilityClass);
 };

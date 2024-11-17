@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 
+#include "AbilitySystem/Abilities/TurpGameplayAbility.h"
+
 void UTurpAbilitySystemComponent::ActivateGameplayAbility(const FGameplayTag& AbilityTag)
 {
 	// TODO: Optimize this later
@@ -26,11 +28,9 @@ void UTurpAbilitySystemComponent::ActivateGameplayAbility(const FGameplayTag& Ab
 	}
 }
 
-void UTurpAbilitySystemComponent::AddCharacterAbility(TSubclassOf<UGameplayAbility> AbilityClass)
+void UTurpAbilitySystemComponent::AddCharacterAbility(const TSubclassOf<UGameplayAbility>& AbilityClass)
 {
 	FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-
-	const auto tag = FGameplayTag::RequestGameplayTag(FName("Events.Fire"));
-	AbilitySpec.DynamicAbilityTags.AddTag(tag);
+	AbilitySpec.DynamicAbilityTags.AddTag(Cast<UTurpGameplayAbility>(AbilitySpec.Ability)->GetAbilityTag());
 	GiveAbility(AbilitySpec);
 }

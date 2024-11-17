@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
-#include "FireBolt.generated.h"
+#include "ScorchingRay.generated.h"
 
 class ATurpProjectile;
 /**
  * 
  */
 UCLASS()
-class TURP_API UFireBolt : public UTurpGameplayAbility
+class TURP_API UScorchingRay : public UTurpGameplayAbility
 {
 	GENERATED_BODY()
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Fire Bolt")
-	TSubclassOf<ATurpProjectile> ProjectileClass;
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Scorching Ray")
+	TSubclassOf<ATurpProjectile> ProjectileClass;
+
 	UFUNCTION(BlueprintCallable)
-	void SpawnProjectile();
+	void SpawnProjectiles();
 };

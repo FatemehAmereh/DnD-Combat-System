@@ -50,10 +50,13 @@ void ATurpCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributesEffect, 1.f);
 }
 
-void ATurpCharacterBase::InitializeStartupAbilities(const TSubclassOf<UGameplayAbility> AbilityClass) const
+void ATurpCharacterBase::InitializeStartupAbilities() const
 {
 	// TODO: has to initialize all abilities later
 	
 	const auto TurpAbilitySystemComponent = CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent);
-	TurpAbilitySystemComponent->AddCharacterAbility(AbilityClass);
+	for (const auto& AbilityClass : StartUpGameplayAbilities)
+	{
+		TurpAbilitySystemComponent->AddCharacterAbility(AbilityClass);	
+	}
 }

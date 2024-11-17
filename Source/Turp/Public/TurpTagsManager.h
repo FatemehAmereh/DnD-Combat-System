@@ -13,8 +13,12 @@ struct FTurpTagsManager
 	static const FTurpTagsManager& Get() { return GameplayTags;}
 	static void InitializeNativeGameplayTags();
 
+	// Saving Throw
 	FGameplayTag SavingThrow_Strength;
 	
+	// Ability
+	FGameplayTag Ability_FireBolt;
+	FGameplayTag Ability_ScorchingRay;
 private:
 	static FTurpTagsManager GameplayTags;
 };

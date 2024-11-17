@@ -1,21 +1,21 @@
 // Copyright Erza.
 
 
-#include "AbilitySystem/Abilities/FireBolt.h"
-
+#include "AbilitySystem/Abilities/ScorchingRay.h"
 #include "AbilitySystemComponent.h"
 #include "Actor/TurpProjectile.h"
-#include "Game/TurpGameStateBase.h"
 #include "Interaction/CombatInterface.h"
 
-void UFireBolt::SpawnProjectile()
+void UScorchingRay::SpawnProjectiles()
 {
-	if(const auto CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
+	// TODO: Find the middle position between targets to face towards.
+
+	for (int i = 0; i < TurpGameState->CombatPacket.Targets.Num(); ++i)
 	{
 		// Find Target
 		FVector TargetLocation = FVector::Zero();
 		bool DisableOverlap = false;
-		const auto TargetData = TurpGameState->CombatPacket.Targets[0];
+		const auto TargetData = TurpGameState->CombatPacket.Targets[i];
 		if(TargetData.ASC)
 		{
 			TargetLocation = TargetData.ASC->AbilityActorInfo->AvatarActor->GetActorLocation();
@@ -26,7 +26,8 @@ void UFireBolt::SpawnProjectile()
 			DisableOverlap = true;
 		}
 		//
-		
+
+		const auto CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 		const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
 		const FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
 
@@ -42,7 +43,7 @@ void UFireBolt::SpawnProjectile()
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		Projectile->SetTargetIndex(0);
+		Projectile->SetTargetIndex(i);
 		if(DisableOverlap)
 		{
 			Projectile->DisableOverlap();
@@ -53,9 +54,5 @@ void UFireBolt::SpawnProjectile()
 		}
 		
 		Projectile->FinishSpawning(SpawnTransform);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("[FireBolt.cpp] No CombatInterface on Attacker!"))
 	}
 }
