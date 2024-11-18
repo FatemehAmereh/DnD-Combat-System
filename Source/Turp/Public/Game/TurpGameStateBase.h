@@ -11,6 +11,12 @@ class UGameplayAbility;
 class UAbilitySystemComponent;
 class UGameplayEffect;
 
+UENUM()
+enum class EAoeType : uint8
+{
+	None, Box, Sphere, Cone
+};
+
 USTRUCT(BlueprintType)
 struct FDice
 {
@@ -121,6 +127,8 @@ struct FGameplayAbilityProperties
 		EffectClass = nullptr;
 		TargetCount = 0;
 		Range = 0;
+		AoeType = EAoeType::None;
+		AoeRange = 0;
 		Damage.Reset();
 		Condition.Reset();
 		OtherAttributeChanges.Reset();
@@ -134,6 +142,12 @@ struct FGameplayAbilityProperties
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int Range;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	EAoeType AoeType;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int AoeRange;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityDamageProperties Damage;

@@ -40,8 +40,26 @@ void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase*
 	GameState->CombatPacket.Targets.Add(TargetData);
 }
 
+void UTurpAbilitySystemBlueprintFL::AddTargetASCForCombatPacket(ATurpGameStateBase* GameState,
+	UAbilitySystemComponent* TargetASC)
+{
+	FTurpAbilityTargetData TargetData;
+	TargetData.ASC = TargetASC;
+	TargetData.Location = TargetASC->GetAvatarActor()->GetActorLocation();
+	GameState->CombatPacket.Targets.Add(TargetData);
+}
+
+void UTurpAbilitySystemBlueprintFL::AddTargetLocationForCombatPacket(ATurpGameStateBase* GameState,
+	FVector TargetLocation)
+{
+	FTurpAbilityTargetData TargetData;
+	TargetData.ASC = nullptr;
+	TargetData.Location = TargetLocation;
+	GameState->CombatPacket.Targets.Add(TargetData);
+}
+
 void UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(ATurpGameStateBase* GameState,
-	const FGameplayAbilityProperties& AbilityProperties)
+                                                                                const FGameplayAbilityProperties& AbilityProperties)
 {
 	GameState->CombatPacket.AbilityProperties = AbilityProperties;
 }
@@ -56,7 +74,7 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 	return DieRollResult;
 }
 
-void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
+void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
 	// Requirement check here.
 	const auto& GameplayTags = FTurpTagsManager::Get();
@@ -80,6 +98,10 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 			if(AbilityProperties.Damage.SavingThrowTag == GameplayTags.SavingThrow_Strength)
 			{
 				SaveRoll += TargetAttributeSet->GetStrengthST();
+			}
+			if(AbilityProperties.Damage.SavingThrowTag == GameplayTags.SavingThrow_Dexterity)
+			{
+				SaveRoll += TargetAttributeSet->GetDexterityST();
 			}
 
 			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
@@ -132,5 +154,13 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(const ATurpGameStateBase
 		}
 		GEngine->AddOnScreenDebugMessage(0, 10, FColor::Blue, DebugMsg);
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
+	}
+}
+
+void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState)
+{
+	for (int i = 0; i < GameState->CombatPacket.Targets.Num(); ++i)
+	{
+		ApplyGameplayEffectToTarget(GameState, i);
 	}
 }	

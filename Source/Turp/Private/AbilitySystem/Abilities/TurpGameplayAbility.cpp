@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/Tasks/TargetDataUnderMouse.h"
@@ -32,6 +33,32 @@ void UTurpGameplayAbility::FaceTargetBeforeAttacking(const FVector TargetPoint)
 {
 	const FVector Target = TurpGameState->CombatPacket.Targets.IsEmpty() ? TargetPoint : FindTargetToFaceTowards();
 	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(), Target);
+}
+
+void UTurpGameplayAbility::TraceToFindTargets(const FVector TraceCenter, bool ApplyEffect)
+{
+	TArray<FHitResult> HitResults;
+	if( GameplayAbilityProperties.AoeType == EAoeType::Sphere )
+	{
+		const float Radius = UTurpAbilitySystemBlueprintFL::FootToCentimeter(GameplayAbilityProperties.AoeRange);
+		const auto Sphere = FCollisionShape::MakeSphere(Radius);
+		GetWorld()->SweepMultiByChannel(HitResults, TraceCenter, TraceCenter, FQuat::Identity, ECC_Visibility, Sphere);
+		UKismetSystemLibrary::DrawDebugSphere(this, TraceCenter, Radius, 12, FLinearColor::Red, 5.f);
+	}
+	// TODO: Handle Box and Cone Collision Shapes
+
+	for (const auto& HitResult : HitResults)
+	{
+		if(const auto ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor()))
+		{
+			UTurpAbilitySystemBlueprintFL::AddTargetASCForCombatPacket(TurpGameState, ASC);
+		}
+	}
+	
+	if(ApplyEffect)
+	{
+		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(TurpGameState);
+	}
 }
 
 

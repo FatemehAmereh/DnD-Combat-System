@@ -26,10 +26,13 @@ protected:
 	// Face the ability owner towards the target before starting attack initiates.
 	UFUNCTION(BlueprintCallable)
 	virtual void FaceTargetBeforeAttacking(const FVector TargetPoint);
+
+	UFUNCTION(BlueprintCallable)
+	void TraceToFindTargets(const FVector TraceCenter, bool ApplyEffect = true);
 	
 	// Return the first target in the current combat packet.
 	virtual FVector FindTargetToFaceTowards();
-
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability Settings")
 	FGameplayAbilityProperties GameplayAbilityProperties;
 
@@ -39,6 +42,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ATurpGameStateBase> TurpGameState;
 
+	// Used in blueprint.
 	UPROPERTY(BlueprintReadWrite, Category="Target")
 	int TargetsReceived = 0;
 };

@@ -36,6 +36,12 @@ public:
 	static void AddTargetForCombatPacket(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
+	static void AddTargetASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* TargetASC);
+
+	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
+	static void AddTargetLocationForCombatPacket(ATurpGameStateBase* GameState, FVector TargetLocation);
+	
+	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetGameplayAbilityPropertiesForCombatPacket(ATurpGameStateBase* GameState, const FGameplayAbilityProperties& AbilityProperties);
 	//
 
@@ -44,6 +50,13 @@ public:
 	//
 
 	// Gameplay Effect
-	static void ApplyGameplayEffect(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
+	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
+
+	static void ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState);
 	//
+
+	static constexpr float FootToCentimeter(const int Foot)
+	{
+		return Foot / 3.281f * 100.f;
+	}
 };
