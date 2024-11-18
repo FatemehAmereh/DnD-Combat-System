@@ -25,7 +25,7 @@ protected:
 
 	// Face the ability owner towards the target before starting attack initiates.
 	UFUNCTION(BlueprintCallable)
-	virtual void FaceTargetBeforeAttacking();
+	virtual void FaceTargetBeforeAttacking(const FVector TargetPoint);
 	
 	// Return the first target in the current combat packet.
 	virtual FVector FindTargetToFaceTowards();

@@ -43,13 +43,14 @@ void UFireBolt::SpawnProjectile()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		Projectile->SetTargetIndex(0);
+		Projectile->SetApplyEffect(true);
 		if(DisableOverlap)
 		{
 			Projectile->DisableOverlap();
 		}
 		else
 		{
-			Projectile->SetTargetASC(TargetData.ASC);
+			Projectile->SetTarget(TargetData.ASC->GetAvatarActor());
 		}
 		
 		Projectile->FinishSpawning(SpawnTransform);

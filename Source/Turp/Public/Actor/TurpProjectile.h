@@ -19,7 +19,8 @@ public:
 	ATurpProjectile();
 	void SetTargetIndex(const uint8 Index);
 	void DisableOverlap();
-	void SetTargetASC(UAbilitySystemComponent* ASC);
+	void SetTarget(AActor* Target);
+	void SetApplyEffect(bool ToApply);
 protected:
 	virtual void BeginPlay() override;
 	
@@ -33,10 +34,12 @@ protected:
 	TObjectPtr<USphereComponent> Sphere;
 
 	uint8 TargetIndexInCombatPacket = 0;
-
+	bool ApplyEffect = false;
+	
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
-	TObjectPtr<UAbilitySystemComponent> TargetASC;
+	UPROPERTY()
+	TObjectPtr<AActor> TargetActor;
 };

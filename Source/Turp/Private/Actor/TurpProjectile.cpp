@@ -3,7 +3,10 @@
 
 #include "Actor/TurpProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "TurpTagsManager.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
+#include "Actor/ProjectileTargetActor.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -36,9 +39,14 @@ void ATurpProjectile::DisableOverlap()
 	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
-void ATurpProjectile::SetTargetASC(UAbilitySystemComponent* ASC)
+void ATurpProjectile::SetTarget(AActor* Target)
 {
-	TargetASC = ASC;
+	TargetActor = Target;
+}
+
+void ATurpProjectile::SetApplyEffect(bool ToApply)
+{
+	ApplyEffect = ToApply;
 }
 
 void ATurpProjectile::BeginPlay()
@@ -52,9 +60,18 @@ void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-	if(OtherActor == TargetASC->GetAvatarActor())
+	if(OtherActor == TargetActor)
 	{
-		UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, TargetIndexInCombatPacket);
+		if(ApplyEffect)
+		{
+			UTurpAbilitySystemBlueprintFL::ApplyGameplayEffect(GameState, TargetIndexInCombatPacket);
+		}
+		if(Cast<AProjectileTargetActor>(TargetActor))
+		{
+			TargetActor->Destroy();
+			const FGameplayEventData Payload;
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Owner, FTurpTagsManager::Get().GameplayEvent_StartTrace, Payload);
+		}
 		Destroy();
 	}
 }

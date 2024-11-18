@@ -120,6 +120,7 @@ struct FGameplayAbilityProperties
 	{
 		EffectClass = nullptr;
 		TargetCount = 0;
+		Range = 0;
 		Damage.Reset();
 		Condition.Reset();
 		OtherAttributeChanges.Reset();
@@ -130,6 +131,9 @@ struct FGameplayAbilityProperties
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int TargetCount;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int Range;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityDamageProperties Damage;

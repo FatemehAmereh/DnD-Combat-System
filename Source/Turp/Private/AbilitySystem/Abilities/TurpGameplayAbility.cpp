@@ -28,24 +28,21 @@ void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,
 	UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(TurpGameState, GameplayAbilityProperties);
 }
 
-void UTurpGameplayAbility::FaceTargetBeforeAttacking()
+void UTurpGameplayAbility::FaceTargetBeforeAttacking(const FVector TargetPoint)
 {
-	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(), FindTargetToFaceTowards());
+	const FVector Target = TurpGameState->CombatPacket.Targets.IsEmpty() ? TargetPoint : FindTargetToFaceTowards();
+	Cast<ICombatInterface>(GetAvatarActorFromActorInfo())->Execute_FaceTarget(GetAvatarActorFromActorInfo(), Target);
 }
 
 
 FVector UTurpGameplayAbility::FindTargetToFaceTowards()
 {
-	if(!TurpGameState->CombatPacket.Targets.IsEmpty())
+	if(TurpGameState->CombatPacket.Targets[0].ASC)
 	{
-		if(TurpGameState->CombatPacket.Targets[0].ASC)
-		{
-			return TurpGameState->CombatPacket.Targets[0].ASC->GetAvatarActor()->GetActorLocation();
-		}
-		else
-		{
-			return TurpGameState->CombatPacket.Targets[0].Location;
-		}
+		return TurpGameState->CombatPacket.Targets[0].ASC->GetAvatarActor()->GetActorLocation();
 	}
-	return FVector::Zero();
+	else
+	{
+		return TurpGameState->CombatPacket.Targets[0].Location;
+	}
 }
