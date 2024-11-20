@@ -56,6 +56,7 @@ void UTurpAbilitySystemComponent::InitializeConditionActions()
 	}
 	
 	OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &UTurpAbilitySystemComponent::OnDurationEffectApplied);
+	OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &UTurpAbilitySystemComponent::OnEffectRemoved);
 }
 
 void UTurpAbilitySystemComponent::OnDurationEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,
@@ -80,6 +81,31 @@ void UTurpAbilitySystemComponent::OnDurationEffectApplied(UAbilitySystemComponen
 			{
 				const int StackCount = *ConditionActionStack.Find(ActionStatus.ActionTag)->Find(ActionStatus.StatusEnum);
 				ConditionActionStack.Find(ActionStatus.ActionTag)->Add(ActionStatus.StatusEnum, StackCount+1);
+			}
+		}
+	}
+}
+
+void UTurpAbilitySystemComponent::OnEffectRemoved(const FActiveGameplayEffect& ActiveEffect)
+{
+	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(ActiveEffect.Handle.GetOwningAbilitySystemComponent()));
+	if(const auto TagsComponent = Cast<UTargetTagsGameplayEffectComponent>(ActiveEffect.Spec.Def->FindComponent(UTargetTagsGameplayEffectComponent::StaticClass())))
+	{
+		const auto NewlyAddedTagsContainer = TagsComponent->GetConfiguredTargetTagChanges().Added;
+		TArray<FGameplayTag> NewlyAddedTags;
+		NewlyAddedTagsContainer.GetGameplayTagArray(NewlyAddedTags);
+
+		// Tag ex. Condition_blind
+		for (const FGameplayTag& ConditionTag : NewlyAddedTags)
+		{
+			// ActionsArray ex. AtkRoll, Disadv
+			TArray<FActionStatusData> ActionsArray;
+			GameState->GameplayConditionDataAsset->FindConditionInfoWithTag(ConditionTag, ActionsArray);
+	
+			for (const auto& ActionStatus : ActionsArray)
+			{
+				const int StackCount = *ConditionActionStack.Find(ActionStatus.ActionTag)->Find(ActionStatus.StatusEnum);
+				ConditionActionStack.Find(ActionStatus.ActionTag)->Add(ActionStatus.StatusEnum, StackCount-1);
 			}
 		}
 	}

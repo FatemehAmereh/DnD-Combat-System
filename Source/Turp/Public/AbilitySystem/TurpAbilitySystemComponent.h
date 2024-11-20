@@ -27,5 +27,5 @@ protected:
 private:
 	// Condition tag callbacks.
 	void OnDurationEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle ActiveEffectHandle);
-
+	void OnEffectRemoved(const FActiveGameplayEffect& ActiveEffect);
 };
