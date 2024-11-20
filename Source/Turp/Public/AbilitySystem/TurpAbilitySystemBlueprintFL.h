@@ -60,7 +60,6 @@ public:
 	{
 		return Foot / 3.281f * 100.f;
 	}
-
-private:
+	
 	static float GetSavingThrowModifier(const UTurpAttributeSet* AttributeSet, const FGameplayTag SavingThrowTag);
 };

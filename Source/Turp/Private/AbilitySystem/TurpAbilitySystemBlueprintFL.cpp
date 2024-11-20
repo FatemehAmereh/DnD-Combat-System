@@ -76,6 +76,17 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
+	// const FCombatPacket& CP = GameState->CombatPacket;
+	// const auto& AbilityProperties = CP.AbilityProperties;
+	// const auto SourceASC = GameState->CombatPacket.SourceASC;
+	// const auto TargetASC = CP.Targets[TargetIndex].ASC;
+	// auto ContextHandle = SourceASC->MakeEffectContext();
+	// ContextHandle.AddSourceObject(SourceASC);
+	// const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
+	//
+	// SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
+
+	
 	const FCombatPacket& CP = GameState->CombatPacket;
 	const auto& AbilityProperties = CP.AbilityProperties;
 	const auto TargetASC = CP.Targets[TargetIndex].ASC;
@@ -120,8 +131,9 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			const uint8 DiceRoll = DieRoll(1, 20);
 			const uint8 BonusMods = static_cast<uint8>(SourceAttributeSet->GetProficiencyBonus() + SourceAttributeSet->GetIntelligenceMod());
 			const uint8 AttackRoll = DiceRoll + BonusMods;
-
-			if(TargetAttributeSet->GetArmorClass() > AttackRoll)
+			const uint8 AC = static_cast<uint8>(TargetAttributeSet->GetArmorClass() + TargetAttributeSet->GetDexterityMod());
+			
+			if(AC > AttackRoll)
 			{
 				// Miss!
 				DebugMsg += TEXT("Attack Miss! ");
@@ -132,9 +144,9 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 				// Hit!
 				DebugMsg += TEXT("Attack Hit! ");
 			}
-			DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), StaticCast<int>(TargetAttributeSet->GetArmorClass()), AttackRoll, DiceRoll, BonusMods);
+			DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
 		}
-
+	
 		// Attack hit or saving throw fail but takes half damage.
 		if(ShouldApplyEffect)
 		{
@@ -144,7 +156,8 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			ContextHandle.AddSourceObject(SourceASC);
 			const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
 			spec.Data->SetSetByCallerMagnitude(AbilityProperties.Damage.ModifierTag, -DamageRoll);
-	
+			spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
+			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
 		
