@@ -7,7 +7,7 @@
 
 namespace
 {
-	float CalculateAttributeModifier(float AttributeValue)
+	float CalculateAttributeModifier(const float AttributeValue)
 	{
 		return FMath::Floor((AttributeValue-10.f) / 2.f);
 	}

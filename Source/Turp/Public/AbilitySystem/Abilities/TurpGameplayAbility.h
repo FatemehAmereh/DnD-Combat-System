@@ -7,7 +7,6 @@
 #include "Game/TurpGameStateBase.h"
 #include "TurpGameplayAbility.generated.h"
 
-class ATurpGameStateBase;
 /**
  * 
  */

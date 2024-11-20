@@ -7,6 +7,7 @@
 #include "TurpTagsManager.h"
 #include "TurpUtilities.h"
 #include "AbilitySystem/TurpAttributeSet.h"
+#include "AbilitySystem/TurpGameplayEffect.h"
 #include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -156,8 +157,10 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			ContextHandle.AddSourceObject(SourceASC);
 			const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
 			spec.Data->SetSetByCallerMagnitude(AbilityProperties.Damage.ModifierTag, -DamageRoll);
+			// How to grant tags
 			spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
-			
+
+			//Cast<UTurpGameplayEffect>(spec.Data->Def)->GetTestVar();
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
 		

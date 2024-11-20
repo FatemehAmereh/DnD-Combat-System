@@ -34,4 +34,13 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 	// Gameplay Event
 	GameplayTags.GameplayEvent_StartTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("GameplayEvent.StartTrace"));
+
+	// Condition Action
+	GameplayTags.Condition_Action_AtkRoll = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Condition.Action.AtkRoll"));
+	GameplayTags.ConditionActionTags.AddTag(GameplayTags.Condition_Action_AtkRoll);
+	
+	// Conditions
+	GameplayTags.Condition_Blind = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Condition.Blind"));
 }

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "TurpAbilitySystemComponent.generated.h"
 
+enum class EActionStatus;
 /**
  * 
  */
@@ -17,4 +18,14 @@ class TURP_API UTurpAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void ActivateGameplayAbility(const FGameplayTag& AbilityTag);
 	void AddCharacterAbility(const TSubclassOf<UGameplayAbility>& AbilityClass);
+	void InitializeConditionActions();
+	
+protected:
+	//   ActionTag   ,      ActionEnum   , StackCount
+	TMap<FGameplayTag, TMap<EActionStatus, int>> ConditionActionStack;
+
+private:
+	// Condition tag callbacks.
+	void OnDurationEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle ActiveEffectHandle);
+
 };

@@ -28,6 +28,21 @@ struct FTurpTagsManager
 	
 	// Gameplay Event
 	FGameplayTag GameplayEvent_StartTrace;
+
+
+	// Condition Action
+	FGameplayTag Condition_Action_AtkRoll;
+	FGameplayTag Condition_Action_StrST;
+	FGameplayTag Condition_Action_DexST;
+	FGameplayTag Condition_Action_ConST;
+	FGameplayTag Condition_Action_IntST;
+	FGameplayTag Condition_Action_WisST;
+	FGameplayTag Condition_Action_ChaST;
+	
+	// Conditions
+	FGameplayTag Condition_Blind;
+
+	FGameplayTagContainer ConditionActionTags;
 private:
 	static FTurpTagsManager GameplayTags;
 };

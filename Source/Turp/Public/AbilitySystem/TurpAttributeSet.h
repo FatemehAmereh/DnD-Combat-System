@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "TurpAttributeSet.generated.h"
 
+
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
@@ -134,4 +135,5 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes|Vital")
 	FGameplayAttributeData MaxHealth;
 //
+	
 };

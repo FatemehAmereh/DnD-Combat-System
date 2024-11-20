@@ -48,6 +48,7 @@ void ATurpCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
 void ATurpCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributesEffect, 1.f);
+	Cast<UTurpAbilitySystemComponent>(AbilitySystemComponent)->InitializeConditionActions();
 }
 
 void ATurpCharacterBase::InitializeStartupAbilities() const
