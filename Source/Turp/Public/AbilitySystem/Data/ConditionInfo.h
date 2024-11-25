@@ -11,21 +11,28 @@
 class UGameplayAbility;
 
 UENUM(BlueprintType)
-enum class EActionStatus
+enum class EActionEnum
+{
+	AtkRoll, StrST, DexST, ConST, IntST, WisST, ChaST
+};
+const TArray<EActionEnum> ConditionActionList{ EActionEnum::AtkRoll, EActionEnum::StrST, EActionEnum::DexST, EActionEnum::ConST,
+												   EActionEnum::IntST, EActionEnum::WisST, EActionEnum::ChaST};
+
+UENUM(BlueprintType)
+enum class EStatusEnum
 {
 	Advantage, Disadvantage, AutoSave, AutoFail, Modifier
 };
+const TArray<EStatusEnum> ActionStatusList{EStatusEnum::Advantage, EStatusEnum::Disadvantage, EStatusEnum::AutoSave,
+												 EStatusEnum::AutoFail, EStatusEnum::Modifier};
 
 USTRUCT(BlueprintType)
 struct FActionStatusData
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag ActionTag;
 	
 	UPROPERTY(EditDefaultsOnly)
-	EActionStatus StatusEnum;
+	EStatusEnum StatusEnum;
 
 	UPROPERTY(EditDefaultsOnly)
 	FDice ModifierDice;
@@ -37,10 +44,7 @@ struct FConditionInfoData
 	GENERATED_BODY()
 	
 	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag ConditionTag;
-
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FActionStatusData> Actions;
+	TMap<EActionEnum, FActionStatusData> Actions;
 };
 
 /**
@@ -53,8 +57,7 @@ class TURP_API UConditionInfo : public UDataAsset
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ConditionInformation")
-	TArray<FConditionInfoData> ConditionInformation;
-
+	TMap<FGameplayTag, FConditionInfoData> ConditionInformation;
 public:
-	 bool FindConditionInfoWithTag(const FGameplayTag ConditionTag, TArray<FActionStatusData>& ActionsArray);
+	 bool GetConditionInfoWithTag(const FGameplayTag ConditionTag, TMap<EActionEnum, FActionStatusData>& Actions);
 };

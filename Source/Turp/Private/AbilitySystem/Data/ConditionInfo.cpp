@@ -3,15 +3,13 @@
 
 #include "AbilitySystem\Data\ConditionInfo.h"
 
-bool UConditionInfo::FindConditionInfoWithTag(const FGameplayTag ConditionTag, TArray<FActionStatusData>& ActionsArray)
+bool UConditionInfo::GetConditionInfoWithTag(const FGameplayTag ConditionTag,
+	TMap<EActionEnum, FActionStatusData>& Actions)
 {
-	for (const FConditionInfoData& ConditionInfo : ConditionInformation)
+	if(const auto SearchResult = ConditionInformation.Find(ConditionTag))
 	{
-		if(ConditionInfo.ConditionTag.MatchesTagExact(ConditionTag))
-		{
-			ActionsArray = ConditionInfo.Actions;
-			return true;
-		}
+		Actions = SearchResult->Actions;
+		return true;
 	}
 	return false;
 }

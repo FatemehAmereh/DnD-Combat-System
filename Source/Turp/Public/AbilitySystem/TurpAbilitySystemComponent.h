@@ -6,7 +6,17 @@
 #include "AbilitySystemComponent.h"
 #include "TurpAbilitySystemComponent.generated.h"
 
-enum class EActionStatus;
+enum class EActionEnum;
+enum class EStatusEnum;
+
+USTRUCT(BlueprintType)
+struct FActionStatusInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly)
+	TMap<EStatusEnum , FGameplayTagContainer> ActionStatusMap;
+};
 /**
  * 
  */
@@ -21,12 +31,10 @@ public:
 	void InitializeConditionActions();
 	
 protected:
-	//   ActionTag   ,      ActionEnum   , StackCount
-	TMap<FGameplayTag, TMap<EActionStatus, int>> ConditionActionStack;
+	//   Action      , <EActionStatus, ConditionTag[]>
+	TMap<EActionEnum , FActionStatusInfo> ConditionActionStack;
 
 private:
-	// Condition tag callbacks.
-	void OnDurationEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle ActiveEffectHandle);
-	void OnEffectRemoved(const FActiveGameplayEffect& ActiveEffect);
-	void UpdateConditionActionStack(const bool ShouldAddStack, const FGameplayEffectSpec& Spec);
+	// Condition tag callbacks; Called whenever a tag is added for the first time or removed.
+	void OnTagTriggered(const FGameplayTag Tag, int32 Count);
 };

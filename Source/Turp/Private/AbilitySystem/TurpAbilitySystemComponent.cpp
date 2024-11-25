@@ -4,6 +4,7 @@
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 
 #include "TurpTagsManager.h"
+#include "TurpUtilities.h"
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
 #include "AbilitySystem/Data/ConditionInfo.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
@@ -41,62 +42,43 @@ void UTurpAbilitySystemComponent::AddCharacterAbility(const TSubclassOf<UGamepla
 
 void UTurpAbilitySystemComponent::InitializeConditionActions()
 {
-	const auto& Tags = FTurpTagsManager::Get();
-
-	// Add Actions and set the stack to 0.
-	for(const auto& ActionTag: Tags.ConditionActionTags)
+	// atkroll, dexst, ...
+	for (const auto& ConditionAction : ConditionActionList)
 	{
-		TMap<EActionStatus, int> Map;
-		Map.Add(EActionStatus::Advantage, 0);
-		Map.Add(EActionStatus::Disadvantage, 0);
-		Map.Add(EActionStatus::Modifier, 0);
-		Map.Add(EActionStatus::AutoFail, 0);
-		Map.Add(EActionStatus::AutoSave, 0);
-		ConditionActionStack.Add(ActionTag, Map);
+		FActionStatusInfo ActionStatusStruct;
+		// adv, disadv, ...
+		 for (const auto& ActionStatus : ActionStatusList)
+		 {
+		 	FGameplayTagContainer ConditionTags;
+		 	ActionStatusStruct.ActionStatusMap.Add(ActionStatus, ConditionTags);
+		 }
+		ConditionActionStack.Add(ConditionAction, ActionStatusStruct);
 	}
 	
-	OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &UTurpAbilitySystemComponent::OnDurationEffectApplied);
-	OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &UTurpAbilitySystemComponent::OnEffectRemoved);
+	RegisterGenericGameplayTagEvent().AddUObject(this, &UTurpAbilitySystemComponent::OnTagTriggered);
 }
 
-void UTurpAbilitySystemComponent::OnDurationEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,
-	FActiveGameplayEffectHandle ActiveEffectHandle)
+void UTurpAbilitySystemComponent::OnTagTriggered(const FGameplayTag Tag, int32 Count)
 {
-	UpdateConditionActionStack(true, Spec);
-}
+	UE_LOG(Turp, Log, TEXT("%s: %d"), *Tag.GetTagName().ToString(), Count);
+	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 
-void UTurpAbilitySystemComponent::OnEffectRemoved(const FActiveGameplayEffect& ActiveEffect)
-{
-	UpdateConditionActionStack(false, ActiveEffect.Spec);
-}
-
-void UTurpAbilitySystemComponent::UpdateConditionActionStack(const bool ShouldAddStack, const FGameplayEffectSpec& Spec)
-{
-	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(Spec.GetContext().GetSourceObject()));
-	check(GameState);
-	const auto& Tags = FTurpTagsManager::Get();
-
-	// Proceed only if this effect applies a tag to the target.
-	if(const auto TagsComponent = Cast<UTargetTagsGameplayEffectComponent>(Spec.Def->FindComponent(UTargetTagsGameplayEffectComponent::StaticClass())))
+	TMap<EActionEnum, FActionStatusData> ConditionActionInfo;
+	if(GameState->GameplayConditionDataAsset->GetConditionInfoWithTag(Tag, ConditionActionInfo))
 	{
-		const auto NewlyAddedTagsContainer = TagsComponent->GetConfiguredTargetTagChanges().Added;
-		TArray<FGameplayTag> NewlyAddedTags;
-		NewlyAddedTagsContainer.GetGameplayTagArray(NewlyAddedTags);
-
-		const int ValueToAddToStack = ShouldAddStack ? 1 : -1;
-		
-		// Tag ex. Condition_blind
-		for (const FGameplayTag& ConditionTag : NewlyAddedTags)
+		for (const auto& ConditionAction : ConditionActionInfo)
 		{
-			// ActionsArray ex. AtkRoll, Disadv
-			TArray<FActionStatusData> ActionsArray;
-			GameState->GameplayConditionDataAsset->FindConditionInfoWithTag(ConditionTag, ActionsArray);
-	
-			for (const auto& ActionStatus : ActionsArray)
+			const auto ActionStatusStruct = ConditionActionStack.Find(ConditionAction.Key);
+			const auto ConditionTagContainer = ActionStatusStruct->ActionStatusMap.Find(ConditionAction.Value.StatusEnum);
+			if(Count == 1)
 			{
-				const int StackCount = *ConditionActionStack.Find(ActionStatus.ActionTag)->Find(ActionStatus.StatusEnum);
-				
-				ConditionActionStack.Find(ActionStatus.ActionTag)->Add(ActionStatus.StatusEnum, StackCount + ValueToAddToStack);
+				// Tag is Newly Added.
+				ConditionTagContainer->AddTag(Tag);
+			}
+			else if(Count == 0)
+			{
+				//Tag is being Removed.
+				ConditionTagContainer->RemoveTag(Tag);
 			}
 		}
 	}
