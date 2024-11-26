@@ -77,42 +77,32 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
-	// const FCombatPacket& CP = GameState->CombatPacket;
-	// const auto& AbilityProperties = CP.AbilityProperties;
-	// const auto SourceASC = GameState->CombatPacket.SourceASC;
-	// const auto TargetASC = CP.Targets[TargetIndex].ASC;
-	// auto ContextHandle = SourceASC->MakeEffectContext();
-	// ContextHandle.AddSourceObject(SourceASC);
-	// const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
-	//
-	// SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
-
-	
 	const FCombatPacket& CP = GameState->CombatPacket;
 	const auto& AbilityProperties = CP.AbilityProperties;
+	const auto& EffectProperties = Cast<UTurpGameplayEffect>(AbilityProperties.EffectClass)->EffectProperties;
 	const auto TargetASC = CP.Targets[TargetIndex].ASC;
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
 	
 	// Ability does damage. Do attack roll or saving throw
-	if(AbilityProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
+	if(EffectProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
 	{
 		bool ShouldApplyEffect = true;
 		
 		// TODO: Check advantage/disadvantage here.
-		uint8 DamageRoll = DieRoll(AbilityProperties.Damage.Dice.Count, AbilityProperties.Damage.Dice.Type);
-		if(AbilityProperties.Damage.NeedsSavingThrow)
+		uint8 DamageRoll = DieRoll(EffectProperties.Damage.Dice.Count, EffectProperties.Damage.Dice.Type);
+		if(EffectProperties.Damage.NeedsSavingThrow)
 		{
 			const uint8 DiceRoll = DieRoll(1, 20);
-			const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAttributeSet, AbilityProperties.Damage.SavingThrowTag));
+			const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAttributeSet, EffectProperties.Damage.SavingThrowTag));
 			const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
 			
 			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
 			{
 				// Saving throw success.
 				DebugMsg += TEXT("SavingThrow succeded! ");
-				if(AbilityProperties.Damage.TakeHalfDamageOnSuccess)
+				if(EffectProperties.Damage.TakeHalfDamageOnSuccess)
 				{
 					DamageRoll *= 0.5f;
 				}
@@ -151,12 +141,12 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		// Attack hit or saving throw fail but takes half damage.
 		if(ShouldApplyEffect)
 		{
-			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), AbilityProperties.Damage.Dice.Count, AbilityProperties.Damage.Dice.Type, DamageRoll);
+			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectProperties.Damage.Dice.Count, EffectProperties.Damage.Dice.Type, DamageRoll);
 			const auto SourceASC = GameState->CombatPacket.SourceASC;
 			auto ContextHandle = SourceASC->MakeEffectContext();
 			ContextHandle.AddSourceObject(SourceASC);
 			const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
-			spec.Data->SetSetByCallerMagnitude(AbilityProperties.Damage.ModifierTag, -DamageRoll);
+			spec.Data->SetSetByCallerMagnitude(EffectProperties.Damage.ModifierTag, -DamageRoll);
 			// How to grant tags
 			spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
 

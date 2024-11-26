@@ -53,6 +53,7 @@ public:
 	// Gameplay Effect
 	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
 
+	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState);
 	//
 

@@ -25,22 +25,14 @@ struct FTurpTagsManager
 	FGameplayTag Ability_FireBolt;
 	FGameplayTag Ability_ScorchingRay;
 	FGameplayTag Ability_Fireball;
+	FGameplayTag Ability_Blindness;
 	
 	// Gameplay Event
 	FGameplayTag GameplayEvent_StartTrace;
-
-
-	// Condition Action
-	FGameplayTag Condition_Action_AtkRoll;
-	FGameplayTag Condition_Action_StrST;
-	FGameplayTag Condition_Action_DexST;
-	FGameplayTag Condition_Action_ConST;
-	FGameplayTag Condition_Action_IntST;
-	FGameplayTag Condition_Action_WisST;
-	FGameplayTag Condition_Action_ChaST;
 	
 	// Conditions
 	FGameplayTag Condition_Blind;
+	FGameplayTag Condition_Prone;
 
 	FGameplayTagContainer ConditionActionTags;
 private:

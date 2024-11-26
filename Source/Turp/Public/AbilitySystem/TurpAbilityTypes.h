@@ -128,9 +128,6 @@ struct FGameplayAbilityProperties
 		Range = 0;
 		AoeType = EAoeType::None;
 		AoeRange = 0;
-		Damage.Reset();
-		Condition.Reset();
-		OtherAttributeChanges.Reset();
 	}
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
@@ -147,6 +144,12 @@ struct FGameplayAbilityProperties
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int AoeRange;
+};
+
+USTRUCT(BlueprintType)
+struct FGameplayEffectProperties
+{
+	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityDamageProperties Damage;
@@ -156,9 +159,10 @@ struct FGameplayAbilityProperties
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FOtherAbilityProperties OtherAttributeChanges;
+	
 };
 
-USTRUCT(Blueprintable, BlueprintType)
+USTRUCT(BlueprintType)
 struct FCombatPacket
 {
 	GENERATED_BODY()
