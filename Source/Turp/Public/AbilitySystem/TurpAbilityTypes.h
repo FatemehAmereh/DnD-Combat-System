@@ -151,6 +151,13 @@ struct FGameplayEffectProperties
 {
 	GENERATED_BODY()
 
+	void Reset()
+	{
+		Damage.Reset();
+		Condition.Reset();
+		OtherAttributeChanges.Reset();
+	}
+	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityDamageProperties Damage;
 
@@ -175,4 +182,7 @@ struct FCombatPacket
 
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayAbilityProperties AbilityProperties;
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayEffectProperties EffectProperties;
 };

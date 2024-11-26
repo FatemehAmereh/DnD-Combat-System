@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
 
+	//static void SetEffectPropertiesOfAbilityForCombatPacket(ATurpGameStateBase* GameState, const FGameplayEffectProperties& EffectProperties);
+	
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void AddTargetForCombatPacket(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
 

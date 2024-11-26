@@ -8,7 +8,6 @@
 #include "TurpUtilities.h"
 #include "AbilitySystem/TurpAttributeSet.h"
 #include "AbilitySystem/TurpGameplayEffect.h"
-#include "AbilitySystem/Requirements/FireBoltActivationRequirement.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -35,8 +34,14 @@ void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBa
 	GameState->CombatPacket.SourceASC = ASC;
 }
 
+// void UTurpAbilitySystemBlueprintFL::SetEffectPropertiesOfAbilityForCombatPacket(ATurpGameStateBase* GameState,
+// 	const FGameplayEffectProperties& EffectProperties)
+// {
+// 	//GameState->CombatPacket.AbilityProperties.e
+// }
+
 void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase* GameState,
-	FTurpAbilityTargetData TargetData)
+                                                             FTurpAbilityTargetData TargetData)
 {
 	GameState->CombatPacket.Targets.Add(TargetData);
 }

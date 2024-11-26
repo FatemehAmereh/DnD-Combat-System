@@ -30,6 +30,8 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 		FName("Ability.ScorchingRay"));
 	GameplayTags.Ability_Fireball = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Ability.Fireball"));
+	GameplayTags.Ability_Blindness = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Blindness"));
 
 	// Gameplay Event
 	GameplayTags.GameplayEvent_StartTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(

@@ -7,6 +7,7 @@ void ATurpGameStateBase::ResetCombatPacket()
 {
 	CombatPacket.SourceASC = nullptr;
 	CombatPacket.Targets.Empty();
-	// Do I need this?
+	// Do I need this here?
 	CombatPacket.AbilityProperties.Reset();
+	CombatPacket.EffectProperties.Reset();
 }
