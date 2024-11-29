@@ -30,6 +30,7 @@ public:
 	void ActivateGameplayAbility(const FGameplayTag& AbilityTag);
 	void AddCharacterAbility(const TSubclassOf<UGameplayAbility>& AbilityClass);
 	void InitializeConditionActions();
+	const FActionStatusInfo* GetConditionStackForAction(const EActionEnum Action) const;
 
 	void AddCondition(const FGameplayTag& ConditionTag);
 	void RemoveCondition(const FGameplayTag& ConditionTag);

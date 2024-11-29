@@ -189,10 +189,12 @@ bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingTh
 	return IsSuccess;
 }
 
-bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS,
-	FString& DebugMsg)
+bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAbilitySystemComponent& TargetASC,
+	const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg)
 {
 	bool IsHit = false;
+
+	TargetASC->
 	const uint8 DiceRoll = RollDie(1, 20);
 	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + SourceAS.GetIntelligenceMod());
 	const uint8 AttackRoll = DiceRoll + BonusMods;
@@ -211,6 +213,23 @@ bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAttributeSet& Sour
 	}
 	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
 	return IsHit;
+}
+
+uint8 UTurpAbilitySystemBlueprintFL::MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC)
+{
+	const auto ConditionStack = TargetASC.GetConditionStackForAction(Action);
+	if(!ConditionStack)
+	{
+		UE_LOG(Turp, Log, TEXT("%s"), *FString("[TurpAbilitySystemBlueprintFL] Action Enum Doesn't exist!"));
+		return 0;
+	}
+
+	if(const auto TagContainer = ConditionStack->ActionStatusMap.Find(EStatusEnum::AutoSave))
+	{
+		//!TagContainer->IsEmpty() = do auto save
+	}
+	
+	
 }
 
 float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,

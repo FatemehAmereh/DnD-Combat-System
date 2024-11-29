@@ -58,6 +58,11 @@ void UTurpAbilitySystemComponent::InitializeConditionActions()
 	RegisterGenericGameplayTagEvent().AddUObject(this, &UTurpAbilitySystemComponent::OnTagTriggered);
 }
 
+const FActionStatusInfo* UTurpAbilitySystemComponent::GetConditionStackForAction(const EActionEnum Action) const
+{
+	return ConditionActionStack.Find(Action);
+}
+
 void UTurpAbilitySystemComponent::AddCondition(const FGameplayTag& ConditionTag)
 {
 	const int CurrentStackCount = GetGameplayTagCount(ConditionTag);
