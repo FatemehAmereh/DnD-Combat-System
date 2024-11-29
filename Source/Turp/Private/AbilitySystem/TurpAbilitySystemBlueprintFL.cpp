@@ -70,7 +70,7 @@ void UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(
 	GameState->CombatPacket.AbilityProperties = AbilityProperties;
 }
 
-uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
+uint8 UTurpAbilitySystemBlueprintFL::RollDie(int Count, int Type)
 {
 	int DieRollResult = 0;
 	for (int i = 0; i < Count; ++i)
@@ -101,73 +101,34 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	// Do Damage.
 	if(EffectInfo->Damage.DoesDamage)
 	{
-		bool ShouldApplyEffect = true;
-		
-		// TODO: Check advantage/disadvantage here.
-		uint8 DamageRoll = DieRoll(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
 
-		// Requires saving throw.
-		if(EffectInfo->Damage.SavingThrowTag != FGameplayTag::EmptyTag)
+		// TODO: Check advantage/disadvantage here.
+		const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		const bool IsHit = MakeAttackRoll(*SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		
+		// Target should take damage if it:
+		// 1. Failed the saving throw
+		// 2. Saved the saving throw but still takes half damage.
+		// 3. Got hit.
+		if(IsHit || !SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess))
 		{
-			const uint8 DiceRoll = DieRoll(1, 20);
-			const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAttributeSet, EffectInfo->Damage.SavingThrowTag));
-			const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
-			
-			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
+			int8 DamageRoll = RollDie(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
+			if(SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)
 			{
-				// Saving throw success.
-				DebugMsg += TEXT("SavingThrow succeded! ");
-				if(EffectInfo->Damage.TakeHalfDamageOnSuccess)
-				{
-					DamageRoll *= 0.5f;
-				}
-				else
-				{
-					ShouldApplyEffect = false;
-				}
+				DamageRoll *= 0.5f;
 			}
-			else
-			{
-				DebugMsg += TEXT("SavingThrow Failed! ");
-			}
-			DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"), StaticCast<int>(SourceAttributeSet->GetSpellSaveDC()), SaveRoll, DiceRoll, SavingThrowModifier);
-		}
-		else
-		{
-			const uint8 DiceRoll = DieRoll(1, 20);
-			const uint8 BonusMods = static_cast<uint8>(SourceAttributeSet->GetProficiencyBonus() + SourceAttributeSet->GetIntelligenceMod());
-			const uint8 AttackRoll = DiceRoll + BonusMods;
-			const uint8 AC = static_cast<uint8>(TargetAttributeSet->GetArmorClass() + TargetAttributeSet->GetDexterityMod());
-			
-			if(AC > AttackRoll)
-			{
-				// Miss!
-				DebugMsg += TEXT("Attack Miss! ");
-				ShouldApplyEffect = false;
-			}
-			else
-			{
-				// Hit!
-				DebugMsg += TEXT("Attack Hit! ");
-			}
-			DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
-		}
-	
-		// Attack hit or saving throw fail but takes half damage.
-		if(ShouldApplyEffect)
-		{
 			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectInfo->Damage.Dice.Count,EffectInfo->Damage.Dice.Type, DamageRoll);
 			const auto SourceASC = GameState->CombatPacket.SourceASC;
 			auto ContextHandle = SourceASC->MakeEffectContext();
 			ContextHandle.AddSourceObject(SourceASC);
 			const auto spec = SourceASC->MakeOutgoingSpec(GameState->DefaultDamageGameplayEffect, 1, ContextHandle);
 			spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
+			
 			// How to grant tags
 			//spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
 			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
-		
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
@@ -190,35 +151,86 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(const ATurpG
 	}
 }
 
-float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet* AttributeSet,
-	const FGameplayTag SavingThrowTag)
+bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingThrowTag,
+	const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg)
+{
+	if(SavingThrowTag == FGameplayTag::EmptyTag)
+	{
+		return false;
+	}
+	
+	bool IsSuccess = false;
+	const uint8 DiceRoll = RollDie(1, 20);
+	const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAS, SavingThrowTag));
+	const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
+			
+	if(SaveRoll > SourceAS.GetSpellSaveDC())
+	{
+		// Saving throw success.
+		DebugMsg += TEXT("SavingThrow succeded! ");
+		IsSuccess = true;
+	}
+	else
+	{
+		DebugMsg += TEXT("SavingThrow Failed! ");
+	}
+	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"), StaticCast<int>(SourceAS.GetSpellSaveDC()), SaveRoll, DiceRoll, SavingThrowModifier);
+	return IsSuccess;
+}
+
+float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,
+                                                            const FGameplayTag SavingThrowTag)
 {
 	const auto& GameplayTags = FTurpTagsManager::Get();
 	if(SavingThrowTag == GameplayTags.SavingThrow_Strength)
 	{
-		return AttributeSet->GetStrengthST();
+		return AttributeSet.GetStrengthST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Dexterity)
 	{
-		return AttributeSet->GetDexterityST();
+		return AttributeSet.GetDexterityST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Constitution)
 	{
-		return AttributeSet->GetConstitutionST();
+		return AttributeSet.GetConstitutionST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Intelligence)
 	{
-		return AttributeSet->GetIntelligenceST();
+		return AttributeSet.GetIntelligenceST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Wisdom)
 	{
-		return AttributeSet->GetWisdomST();
+		return AttributeSet.GetWisdomST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Charisma)
 	{
-		return AttributeSet->GetCharismaST();
+		return AttributeSet.GetCharismaST();
 	}
 
 	UE_LOG(Turp, Error, TEXT("SavingThrow tag of this ability is invalid! Can't retrieve saving throw mod from AS."))
 	return 0.f;
-}	
+}
+
+bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS,
+	FString& DebugMsg)
+{
+	bool IsHit = false;
+	const uint8 DiceRoll = RollDie(1, 20);
+	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + SourceAS.GetIntelligenceMod());
+	const uint8 AttackRoll = DiceRoll + BonusMods;
+	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
+			
+	if(AC > AttackRoll)
+	{
+		// Miss!
+		DebugMsg += TEXT("Attack Miss! ");
+	}
+	else
+	{
+		// Hit!
+		DebugMsg += TEXT("Attack Hit! ");
+		IsHit = true;
+	}
+	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
+	return IsHit;
+}
