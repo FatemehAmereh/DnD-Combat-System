@@ -16,7 +16,7 @@ class TURP_API UProjectileAbility : public UTurpGameplayAbility
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Ability Settings")
 	TSubclassOf<ATurpProjectile> ProjectileClass;
 	
 	UFUNCTION(BlueprintCallable)
