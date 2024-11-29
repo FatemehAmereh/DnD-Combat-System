@@ -3,26 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectileAbility.h"
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
 #include "Fireball.generated.h"
 
 class AProjectileTargetActor;
-class ATurpProjectile;
 /**
  * 
  */
 UCLASS()
-class TURP_API UFireball : public UTurpGameplayAbility
+class TURP_API UFireball : public UProjectileAbility
 {
 	GENERATED_BODY()
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Fireball")
-	TSubclassOf<ATurpProjectile> ProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Fireball")
 	TSubclassOf<AProjectileTargetActor> ProjectileTargetClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector MouseHitLocation = FVector::Zero();
 	
-	UFUNCTION(BlueprintCallable)
-	void SpawnProjectile(FVector MouseHitLocation);
+	virtual void SpawnProjectile(const int TargetIndex) override;
 };

@@ -7,7 +7,7 @@
 #include "Actor/TurpProjectile.h"
 #include "Interaction/CombatInterface.h"
 
-void UFireball::SpawnProjectile(FVector MouseHitLocation)
+void UFireball::SpawnProjectile(const int TargetIndex)
 {
 	const auto CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());

@@ -6,7 +6,6 @@
 #include "ProjectileAbility.h"
 #include "FireBolt.generated.h"
 
-class ATurpProjectile;
 /**
  * 
  */
