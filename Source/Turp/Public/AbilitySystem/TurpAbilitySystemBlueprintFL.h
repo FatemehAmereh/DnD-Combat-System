@@ -24,16 +24,14 @@ class TURP_API UTurpAbilitySystemBlueprintFL : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	// UI
+	/// UI
 	UFUNCTION(BlueprintPure, Category="TurpAbilitySystemBlueprintFunctionLibrary|WidgetController" )
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
-	//
+	///
 	
-	// Combat Packet
+	/// Combat Packet Update.
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
-
-	//static void SetEffectPropertiesOfAbilityForCombatPacket(ATurpGameStateBase* GameState, const FGameplayEffectProperties& EffectProperties);
 	
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void AddTargetForCombatPacket(ATurpGameStateBase* GameState, FTurpAbilityTargetData TargetData);
@@ -46,23 +44,22 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetGameplayAbilityPropertiesForCombatPacket(ATurpGameStateBase* GameState, const FGameplayAbilityProperties& AbilityProperties);
-	//
-
-	// Die Roll
-	static uint8 RollDie(int Count, int Type);
-	//
-
-	// Gameplay Effect
+	///
+	
+	/// Gameplay Effect
 	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState);
-	//
+	///
 
+	/// Utility
+	static uint8 RollDie(int Count, int Type);
 	static constexpr float FootToCentimeter(const int Foot)
 	{
 		return Foot / 3.281f * 100.f;
 	}
+	///
 
 private:
 	// Return true if target succeeds the saving throw.
