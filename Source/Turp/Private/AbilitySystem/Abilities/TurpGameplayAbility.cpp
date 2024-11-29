@@ -13,7 +13,7 @@
 
 FGameplayTag UTurpGameplayAbility::GetAbilityTag() const
 {
-	return AbilityTag;
+	return GameplayAbilityProperties.AbilityTag;
 }
 
 void UTurpGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle,

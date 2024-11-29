@@ -34,6 +34,9 @@ struct FTurpTagsManager
 	FGameplayTag Condition_Blind;
 	FGameplayTag Condition_Prone;
 
+	// Damage modifier tag used in default GameplayEffect asset for applying damage.
+	FGameplayTag DamageModifier;
+	
 	FGameplayTagContainer ConditionActionTags;
 private:
 	static FTurpTagsManager GameplayTags;

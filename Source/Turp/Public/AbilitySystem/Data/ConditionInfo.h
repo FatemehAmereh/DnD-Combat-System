@@ -56,7 +56,7 @@ class TURP_API UConditionInfo : public UDataAsset
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ConditionInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Condition Information")
 	TMap<FGameplayTag, FConditionInfoData> ConditionInformation;
 public:
 	 bool GetConditionInfoWithTag(const FGameplayTag ConditionTag, TMap<EActionEnum, FActionStatusData>& Actions);

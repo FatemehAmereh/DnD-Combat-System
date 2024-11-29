@@ -82,32 +82,42 @@ uint8 UTurpAbilitySystemBlueprintFL::DieRoll(int Count, int Type)
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex)
 {
+	// 1. Apply Effect:
+	//		Do the dmg
+	//		Apply condition: Add condition tag to stack (Add to ASC containers too?)
+	// 2. Add Effect to stack
+
+
+	// Get relevant variables.
 	const FCombatPacket& CP = GameState->CombatPacket;
 	const auto& AbilityProperties = CP.AbilityProperties;
-	const auto& EffectProperties = Cast<UTurpGameplayEffect>(AbilityProperties.EffectClass)->EffectProperties;
+	const auto EffectInfo = GameState->GameplayEffectInformation->GetEffectInfoWithTag(AbilityProperties.AbilityTag);
 	const auto TargetASC = CP.Targets[TargetIndex].ASC;
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+
 	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
-	
-	// Ability does damage. Do attack roll or saving throw
-	if(EffectProperties.Damage.ModifierTag != FGameplayTag::EmptyTag)
+
+	// Do Damage.
+	if(EffectInfo->Damage.DoesDamage)
 	{
 		bool ShouldApplyEffect = true;
 		
 		// TODO: Check advantage/disadvantage here.
-		uint8 DamageRoll = DieRoll(EffectProperties.Damage.Dice.Count, EffectProperties.Damage.Dice.Type);
-		if(EffectProperties.Damage.NeedsSavingThrow)
+		uint8 DamageRoll = DieRoll(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
+
+		// Requires saving throw.
+		if(EffectInfo->Damage.SavingThrowTag != FGameplayTag::EmptyTag)
 		{
 			const uint8 DiceRoll = DieRoll(1, 20);
-			const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAttributeSet, EffectProperties.Damage.SavingThrowTag));
+			const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAttributeSet, EffectInfo->Damage.SavingThrowTag));
 			const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
 			
 			if(SaveRoll > SourceAttributeSet->GetSpellSaveDC())
 			{
 				// Saving throw success.
 				DebugMsg += TEXT("SavingThrow succeded! ");
-				if(EffectProperties.Damage.TakeHalfDamageOnSuccess)
+				if(EffectInfo->Damage.TakeHalfDamageOnSuccess)
 				{
 					DamageRoll *= 0.5f;
 				}
@@ -146,23 +156,30 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		// Attack hit or saving throw fail but takes half damage.
 		if(ShouldApplyEffect)
 		{
-			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectProperties.Damage.Dice.Count, EffectProperties.Damage.Dice.Type, DamageRoll);
+			DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectInfo->Damage.Dice.Count,EffectInfo->Damage.Dice.Type, DamageRoll);
 			const auto SourceASC = GameState->CombatPacket.SourceASC;
 			auto ContextHandle = SourceASC->MakeEffectContext();
 			ContextHandle.AddSourceObject(SourceASC);
-			const auto spec = SourceASC->MakeOutgoingSpec(AbilityProperties.EffectClass, 1, ContextHandle);
-			spec.Data->SetSetByCallerMagnitude(EffectProperties.Damage.ModifierTag, -DamageRoll);
+			const auto spec = SourceASC->MakeOutgoingSpec(GameState->DefaultDamageGameplayEffect, 1, ContextHandle);
+			spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
 			// How to grant tags
-			spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
-
-			//Cast<UTurpGameplayEffect>(spec.Data->Def)->GetTestVar();
+			//spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
+			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
 		
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
-	
-	// TODO: Check applying condition.
+
+	// Apply condition
+	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
+	{
+		// Requires saving throw.
+		if(EffectInfo->Condition.SavingThrowTag != FGameplayTag::EmptyTag)
+		{
+		
+		}
+	}
 }
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState)

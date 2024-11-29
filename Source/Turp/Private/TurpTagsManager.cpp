@@ -63,4 +63,9 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 	// Conditions
 	GameplayTags.Condition_Blind = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Condition.Blind"));
+	GameplayTags.Condition_Prone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Condition.Prone"));
+
+	GameplayTags.DamageModifier = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("DamageModifier"));
 }

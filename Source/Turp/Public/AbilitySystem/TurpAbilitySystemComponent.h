@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "TurpAbilitySystemComponent.generated.h"
 
+struct FConditionStackElement;
+struct FEffectStackElement;
 enum class EActionEnum;
 enum class EStatusEnum;
 
@@ -33,6 +35,9 @@ public:
 protected:
 	//   Action      , <EActionStatus, ConditionTag[]>
 	TMap<EActionEnum , FActionStatusInfo> ConditionActionStack;
+
+	TArray<FEffectStackElement> ActiveEffectStack;
+	TArray<FConditionStackElement> ActiveConditionStack;
 
 private:
 	// Condition tag callbacks; Called whenever a tag is added for the first time or removed.

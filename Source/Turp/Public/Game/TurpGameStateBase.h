@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/ConditionInfo.h"
 #include "AbilitySystem/TurpAbilityTypes.h"
+#include "AbilitySystem/Data/EffectInfo.h"
 #include "GameFramework/GameStateBase.h"
 #include "TurpGameStateBase.generated.h"
 
@@ -25,6 +26,14 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FCombatPacket CombatPacket;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UConditionInfo> GameplayConditionDataAsset;
+	// From Data Asset.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	TObjectPtr<UConditionInfo> GameplayConditionInformation;
+
+	// From Data Asset.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	TObjectPtr<UEffectInfo> GameplayEffectInformation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	TSubclassOf<UGameplayEffect> DefaultDamageGameplayEffect;
 };

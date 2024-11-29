@@ -34,9 +34,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability Settings")
 	FGameplayAbilityProperties GameplayAbilityProperties;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability Settings")
-	FGameplayTag AbilityTag;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ATurpGameStateBase> TurpGameState;

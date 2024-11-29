@@ -64,7 +64,7 @@ void UTurpAbilitySystemComponent::OnTagTriggered(const FGameplayTag Tag, int32 C
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
 
 	TMap<EActionEnum, FActionStatusData> ConditionActionInfo;
-	if(GameState->GameplayConditionDataAsset->GetConditionInfoWithTag(Tag, ConditionActionInfo))
+	if(GameState->GameplayConditionInformation->GetConditionInfoWithTag(Tag, ConditionActionInfo))
 	{
 		for (const auto& ConditionAction : ConditionActionInfo)
 		{

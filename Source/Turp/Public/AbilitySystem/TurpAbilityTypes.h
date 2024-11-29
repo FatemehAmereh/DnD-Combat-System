@@ -53,16 +53,15 @@ struct FAbilityDamageProperties
 
 	void Reset()
 	{
-		NeedsSavingThrow = false;
+		DoesDamage = false;
 		TakeHalfDamageOnSuccess = false;
 		SavingThrowTag = FGameplayTag::EmptyTag;
-		ModifierTag =FGameplayTag::EmptyTag;
 		Dice = FDice();
 	}
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	bool NeedsSavingThrow;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool DoesDamage = false;
+	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	bool TakeHalfDamageOnSuccess;
 	
@@ -71,9 +70,6 @@ struct FAbilityDamageProperties
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FDice Dice;
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayTag ModifierTag;
 };
 
 USTRUCT(BlueprintType)
@@ -83,13 +79,9 @@ struct FAbilityConditionProperties
 
 	void Reset()
 	{
-		NeedsSavingThrow = false;
 		SavingThrowTag = FGameplayTag::EmptyTag;
 		TagsToGrant.Empty();
 	}
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	bool NeedsSavingThrow;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FGameplayTag SavingThrowTag;
@@ -99,51 +91,33 @@ struct FAbilityConditionProperties
 };
 
 USTRUCT(BlueprintType)
-struct FOtherAbilityProperties
-{
-	GENERATED_BODY()
-
-	void Reset()
-	{
-		ModifierMagnitude = 0;
-		ModifierTag = FGameplayTag::EmptyTag;
-	}
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	int ModifierMagnitude;
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayTag ModifierTag;
-};
-
-USTRUCT(BlueprintType)
 struct FGameplayAbilityProperties
 {
 	GENERATED_BODY()
 
 	void Reset()
 	{
-		EffectClass = nullptr;
+		AbilityTag = FGameplayTag::EmptyTag;
 		TargetCount = 0;
 		Range = 0;
 		AoeType = EAoeType::None;
 		AoeRange = 0;
 	}
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> EffectClass;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	int TargetCount;
+	FGameplayTag AbilityTag;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	int Range;
+	uint8 TargetCount;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 Range;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	EAoeType AoeType;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	int AoeRange;
+	uint8 AoeRange;
 };
 
 USTRUCT(BlueprintType)
@@ -153,20 +127,23 @@ struct FGameplayEffectProperties
 
 	void Reset()
 	{
+		Duration = 0;
+		CanStack = false;
 		Damage.Reset();
 		Condition.Reset();
-		OtherAttributeChanges.Reset();
 	}
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 Duration;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool CanStack = false;
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityDamageProperties Damage;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FAbilityConditionProperties Condition;
-	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FOtherAbilityProperties OtherAttributeChanges;
-	
 };
 
 USTRUCT(BlueprintType)
@@ -185,4 +162,31 @@ struct FCombatPacket
 
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayEffectProperties EffectProperties;
+};
+
+USTRUCT(BlueprintType)
+struct FEffectStackElement
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag EffectTag;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 DurationLeft;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 StackCount;
+};
+
+USTRUCT(BlueprintType)
+struct FConditionStackElement
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag ConditionTag;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 StackCount;
 };
