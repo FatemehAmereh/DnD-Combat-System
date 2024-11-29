@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectileAbility.h"
 #include "AbilitySystem/Abilities/TurpGameplayAbility.h"
 #include "ScorchingRay.generated.h"
 
@@ -11,14 +12,11 @@ class ATurpProjectile;
  * 
  */
 UCLASS()
-class TURP_API UScorchingRay : public UTurpGameplayAbility
+class TURP_API UScorchingRay : public UProjectileAbility
 {
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Scorching Ray")
-	TSubclassOf<ATurpProjectile> ProjectileClass;
-
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectiles();
 };

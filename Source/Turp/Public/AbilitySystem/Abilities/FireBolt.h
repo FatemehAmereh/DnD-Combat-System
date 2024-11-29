@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Abilities/TurpGameplayAbility.h"
+#include "ProjectileAbility.h"
 #include "FireBolt.generated.h"
 
 class ATurpProjectile;
@@ -11,14 +11,7 @@ class ATurpProjectile;
  * 
  */
 UCLASS()
-class TURP_API UFireBolt : public UTurpGameplayAbility
+class TURP_API UFireBolt : public UProjectileAbility
 {
 	GENERATED_BODY()
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Fire Bolt")
-	TSubclassOf<ATurpProjectile> ProjectileClass;
-	
-	UFUNCTION(BlueprintCallable)
-	void SpawnProjectile();
 };
