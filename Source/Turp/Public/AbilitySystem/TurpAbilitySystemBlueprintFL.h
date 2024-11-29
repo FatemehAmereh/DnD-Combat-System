@@ -67,7 +67,7 @@ public:
 private:
 	// Return true if target succeeds the saving throw.
 	static bool MakeSavingThrow(const FGameplayTag& SavingThrowTag, const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg);
-	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag SavingThrowTag);
+	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag);
 
 	// Return true if target is Hit by the attack.
 	static bool MakeAttackRoll(const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg);

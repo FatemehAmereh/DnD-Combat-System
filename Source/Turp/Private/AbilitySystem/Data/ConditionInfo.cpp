@@ -8,6 +8,7 @@ bool UConditionInfo::GetConditionInfoWithTag(const FGameplayTag ConditionTag,
 {
 	if(const auto SearchResult = ConditionInformation.Find(ConditionTag))
 	{
+		
 		Actions = SearchResult->Actions;
 		return true;
 	}

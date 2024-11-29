@@ -58,6 +58,75 @@ void UTurpAbilitySystemComponent::InitializeConditionActions()
 	RegisterGenericGameplayTagEvent().AddUObject(this, &UTurpAbilitySystemComponent::OnTagTriggered);
 }
 
+void UTurpAbilitySystemComponent::AddCondition(const FGameplayTag& ConditionTag)
+{
+	const int CurrentStackCount = GetGameplayTagCount(ConditionTag);
+	if(CurrentStackCount == 0)
+	{
+		AddLooseGameplayTag(ConditionTag,1);
+	}
+	else
+	{
+		SetLooseGameplayTagCount(ConditionTag, CurrentStackCount + 1);
+	}
+	// if(const auto ActiveConditionTag = ActiveConditionStack.Find(ConditionTag))
+	// {
+	// 	*ActiveConditionTag = *ActiveConditionTag + 1;
+	// }
+	// else
+	// {
+	// 	ActiveConditionStack.Add(ConditionTag, 1);
+	// 	
+	// }
+}
+
+void UTurpAbilitySystemComponent::RemoveCondition(const FGameplayTag& ConditionTag)
+{
+	const int CurrentStackCount = GetGameplayTagCount(ConditionTag);
+	SetLooseGameplayTagCount(ConditionTag, CurrentStackCount - 1);
+	
+	// if(const auto ActiveConditionTag = ActiveConditionStack.Find(ConditionTag))
+	// {
+	// 	*ActiveConditionTag = *ActiveConditionTag - 1;
+	// 	if(*ActiveConditionTag <= 0)
+	// 	{
+	// 		ActiveConditionStack.Remove(ConditionTag);
+	// 	}
+	// }
+	// else
+	// {
+	// 	UE_LOG(Turp, Error, TEXT("%s"), *FString("[AbilitySystemComponent] Cannot remove condition. "
+	// 									 "Condition doesn't exist on stack."));
+	// }
+}
+
+void UTurpAbilitySystemComponent::AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack)
+{
+	if(EffectTag == FGameplayTag::EmptyTag)
+	{
+		UE_LOG(Turp, Error, TEXT("%s"), *FString("[AbilitySystemComponent] Cannot add effect. Tag is empty."));
+		return;
+	}
+	
+	if(const auto Effect = ActiveEffectStack.Find(EffectTag))
+	{
+		if(CanStack)
+		{
+			// Add stack count.
+			Effect->StackCount++;
+		}
+		else
+		{
+			// Refresh Duration.
+			Effect->DurationLeft = Duration;
+		}
+	}
+	else
+	{
+		ActiveEffectStack.Add(EffectTag, {Duration, 1});	
+	}
+}
+
 void UTurpAbilitySystemComponent::OnTagTriggered(const FGameplayTag Tag, int32 Count)
 {
 	UE_LOG(Turp, Log, TEXT("%s: %d"), *Tag.GetTagName().ToString(), Count);

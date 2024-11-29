@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "TurpTagsManager.h"
 #include "TurpUtilities.h"
+#include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "AbilitySystem/TurpAttributeSet.h"
 #include "AbilitySystem/TurpGameplayEffect.h"
 #include "Game/TurpGameStateBase.h"
@@ -86,13 +87,12 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	//		Do the dmg
 	//		Apply condition: Add condition tag to stack (Add to ASC containers too?)
 	// 2. Add Effect to stack
-
-
+	
 	// Get relevant variables.
 	const FCombatPacket& CP = GameState->CombatPacket;
 	const auto& AbilityProperties = CP.AbilityProperties;
 	const auto EffectInfo = GameState->GameplayEffectInformation->GetEffectInfoWithTag(AbilityProperties.AbilityTag);
-	const auto TargetASC = CP.Targets[TargetIndex].ASC;
+	const auto TargetASC = Cast<UTurpAbilitySystemComponent>(CP.Targets[TargetIndex].ASC);
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 
@@ -125,21 +125,30 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
 			
 			// How to grant tags
-			//spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
+			// spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
 			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
-	// Apply condition
+	// Apply condition.
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
-		// Requires saving throw.
-		if(EffectInfo->Condition.SavingThrowTag != FGameplayTag::EmptyTag)
+		const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		if(!SucceededSavingThrow)
 		{
-		
+			for (const auto& ConditionTag : EffectInfo->Condition.TagsToGrant)
+			{
+				TargetASC->AddCondition(ConditionTag);
+			}
 		}
+	}
+
+	// Add Effect to active Effect stack on Target if it has duration.
+	if(EffectInfo->Duration != 0)
+	{
+		TargetASC->AddEffect(AbilityProperties.AbilityTag, EffectInfo->Duration, EffectInfo->CanStack);
 	}
 }
 
@@ -156,6 +165,7 @@ bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingTh
 {
 	if(SavingThrowTag == FGameplayTag::EmptyTag)
 	{
+		// No need for saving throw. This Effect doesn't require one.
 		return false;
 	}
 	
@@ -172,14 +182,39 @@ bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingTh
 	}
 	else
 	{
+		// Saving throw Fail.
 		DebugMsg += TEXT("SavingThrow Failed! ");
 	}
 	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"), StaticCast<int>(SourceAS.GetSpellSaveDC()), SaveRoll, DiceRoll, SavingThrowModifier);
 	return IsSuccess;
 }
 
+bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS,
+	FString& DebugMsg)
+{
+	bool IsHit = false;
+	const uint8 DiceRoll = RollDie(1, 20);
+	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + SourceAS.GetIntelligenceMod());
+	const uint8 AttackRoll = DiceRoll + BonusMods;
+	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
+			
+	if(AC > AttackRoll)
+	{
+		// Attack Miss!
+		DebugMsg += TEXT("Attack Miss! ");
+	}
+	else
+	{
+		// Attack Hit!
+		DebugMsg += TEXT("Attack Hit! ");
+		IsHit = true;
+	}
+	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
+	return IsHit;
+}
+
 float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,
-                                                            const FGameplayTag SavingThrowTag)
+                                                            const FGameplayTag& SavingThrowTag)
 {
 	const auto& GameplayTags = FTurpTagsManager::Get();
 	if(SavingThrowTag == GameplayTags.SavingThrow_Strength)
@@ -209,28 +244,4 @@ float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttribute
 
 	UE_LOG(Turp, Error, TEXT("SavingThrow tag of this ability is invalid! Can't retrieve saving throw mod from AS."))
 	return 0.f;
-}
-
-bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS,
-	FString& DebugMsg)
-{
-	bool IsHit = false;
-	const uint8 DiceRoll = RollDie(1, 20);
-	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + SourceAS.GetIntelligenceMod());
-	const uint8 AttackRoll = DiceRoll + BonusMods;
-	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
-			
-	if(AC > AttackRoll)
-	{
-		// Miss!
-		DebugMsg += TEXT("Attack Miss! ");
-	}
-	else
-	{
-		// Hit!
-		DebugMsg += TEXT("Attack Hit! ");
-		IsHit = true;
-	}
-	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
-	return IsHit;
 }

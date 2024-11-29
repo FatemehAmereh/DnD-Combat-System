@@ -55,6 +55,7 @@ struct FAbilityDamageProperties
 	{
 		DoesDamage = false;
 		TakeHalfDamageOnSuccess = false;
+		ApplyDamageEveryTurn = false;
 		SavingThrowTag = FGameplayTag::EmptyTag;
 		Dice = FDice();
 	}
@@ -64,6 +65,9 @@ struct FAbilityDamageProperties
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	bool TakeHalfDamageOnSuccess;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool ApplyDamageEveryTurn = false;
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	FGameplayTag SavingThrowTag;
@@ -170,22 +174,7 @@ struct FEffectStackElement
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayTag EffectTag;
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	uint8 DurationLeft;
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	uint8 StackCount;
-};
-
-USTRUCT(BlueprintType)
-struct FConditionStackElement
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	FGameplayTag ConditionTag;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	uint8 StackCount;

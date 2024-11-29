@@ -26,6 +26,7 @@ struct FTurpTagsManager
 	FGameplayTag Ability_ScorchingRay;
 	FGameplayTag Ability_Fireball;
 	FGameplayTag Ability_Blindness;
+	FGameplayTag Ability_RayOfSickness;
 	
 	// Gameplay Event
 	FGameplayTag GameplayEvent_StartTrace;
@@ -33,6 +34,7 @@ struct FTurpTagsManager
 	// Conditions
 	FGameplayTag Condition_Blind;
 	FGameplayTag Condition_Prone;
+	FGameplayTag Condition_Poisoned;
 
 	// Damage modifier tag used in default GameplayEffect asset for applying damage.
 	FGameplayTag DamageModifier;

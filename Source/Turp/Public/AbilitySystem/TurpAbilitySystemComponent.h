@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "TurpAbilityTypes.h"
 #include "TurpAbilitySystemComponent.generated.h"
 
-struct FConditionStackElement;
-struct FEffectStackElement;
 enum class EActionEnum;
 enum class EStatusEnum;
 
@@ -31,13 +30,18 @@ public:
 	void ActivateGameplayAbility(const FGameplayTag& AbilityTag);
 	void AddCharacterAbility(const TSubclassOf<UGameplayAbility>& AbilityClass);
 	void InitializeConditionActions();
+
+	void AddCondition(const FGameplayTag& ConditionTag);
+	void RemoveCondition(const FGameplayTag& ConditionTag);
+
+	void AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack);
 	
 protected:
 	//   Action      , <EActionStatus, ConditionTag[]>
 	TMap<EActionEnum , FActionStatusInfo> ConditionActionStack;
 
-	TArray<FEffectStackElement> ActiveEffectStack;
-	TArray<FConditionStackElement> ActiveConditionStack;
+	TMap<FGameplayTag, FEffectStackElement> ActiveEffectStack;
+	TMap<FGameplayTag, uint8> ActiveConditionStack;
 
 private:
 	// Condition tag callbacks; Called whenever a tag is added for the first time or removed.
