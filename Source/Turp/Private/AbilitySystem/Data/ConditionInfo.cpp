@@ -14,3 +14,12 @@ bool UConditionInfo::GetConditionInfoWithTag(const FGameplayTag ConditionTag,
 	}
 	return false;
 }
+
+FActionStatusData* UConditionInfo::GetActionStatus(const FGameplayTag ConditionTag, const EActionEnum Action)
+{
+	if(const auto ConditionInfo = ConditionInformation.Find(ConditionTag))
+	{
+		return ConditionInfo->Actions.Find(Action);
+	}
+	return nullptr;
+}

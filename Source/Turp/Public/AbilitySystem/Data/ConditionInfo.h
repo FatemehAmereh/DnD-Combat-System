@@ -59,5 +59,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Condition Information")
 	TMap<FGameplayTag, FConditionInfoData> ConditionInformation;
 public:
-	 bool GetConditionInfoWithTag(const FGameplayTag ConditionTag, TMap<EActionEnum, FActionStatusData>& Actions);
+	bool GetConditionInfoWithTag(const FGameplayTag ConditionTag, TMap<EActionEnum, FActionStatusData>& Actions);
+	FActionStatusData* GetActionStatus(const FGameplayTag ConditionTag, const EActionEnum Action);
 };

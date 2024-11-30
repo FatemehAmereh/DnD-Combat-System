@@ -9,6 +9,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TurpAbilitySystemBlueprintFL.generated.h"
 
+class UTurpAbilitySystemComponent;
 class UTurpAttributeSet;
 struct FGameplayAbilityProperties;
 class UGameplayEffect;
@@ -47,7 +48,7 @@ public:
 	///
 	
 	/// Gameplay Effect
-	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase* GameState, const uint8 TargetIndex);
+	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex);
 
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState);
@@ -55,6 +56,7 @@ public:
 
 	/// Utility
 	static uint8 RollDie(int Count, int Type);
+	static uint8 RollDie(FDice Dice);
 	static constexpr float FootToCentimeter(const int Foot)
 	{
 		return Foot / 3.281f * 100.f;
@@ -63,12 +65,15 @@ public:
 
 private:
 	// Return true if target succeeds the saving throw.
-	static bool MakeSavingThrow(const FGameplayTag& SavingThrowTag, const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg);
+	static bool MakeSavingThrow(const FGameplayTag& SavingThrowTag, const ATurpGameStateBase& GameState,
+		const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS,
+		const UTurpAttributeSet& TargetAS, FString& DebugMsg);
 	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag);
 
 	// Return true if target is Hit by the attack.
-	static bool MakeAttackRoll(const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS,
-		const UTurpAttributeSet& TargetAS, FString& DebugMsg);
+	static bool MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& TargetASC,
+		const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg);
 
-	uint8 MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC);
+	static uint8 MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC, const ATurpGameStateBase& GameState);
+	static EActionEnum GetActionEnumForTag(const FGameplayTag& SavingThrowTag);
 };

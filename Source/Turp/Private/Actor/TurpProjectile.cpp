@@ -64,7 +64,7 @@ void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	{
 		if(ApplyEffect)
 		{
-			UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(GameState, TargetIndexInCombatPacket);
+			UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(*GameState, TargetIndexInCombatPacket);
 		}
 		if(Cast<AProjectileTargetActor>(TargetActor))
 		{
