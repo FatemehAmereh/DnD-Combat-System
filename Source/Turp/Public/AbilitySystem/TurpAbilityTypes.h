@@ -28,10 +28,10 @@ struct FDice
 	}
 	
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	uint8 Count;
+	int Count;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	uint8 Type;
+	int Type;
 };
 
 USTRUCT(BlueprintType)

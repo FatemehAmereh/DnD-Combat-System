@@ -55,8 +55,8 @@ public:
 	///
 
 	/// Utility
-	static uint8 RollDie(int Count, int Type);
-	static uint8 RollDie(FDice Dice);
+	static int RollDie(const int Count, const int Type);
+	static int RollDie(const FDice Dice);
 	static constexpr float FootToCentimeter(const int Foot)
 	{
 		return Foot / 3.281f * 100.f;

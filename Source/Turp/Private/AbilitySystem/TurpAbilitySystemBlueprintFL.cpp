@@ -71,7 +71,7 @@ void UTurpAbilitySystemBlueprintFL::SetGameplayAbilityPropertiesForCombatPacket(
 	GameState->CombatPacket.AbilityProperties = AbilityProperties;
 }
 
-uint8 UTurpAbilitySystemBlueprintFL::RollDie(int Count, int Type)
+int UTurpAbilitySystemBlueprintFL::RollDie(const int Count, const int Type)
 {
 	// Constant value. Used for adding a modifier to rolls.
 	if(Count == 0)
@@ -80,14 +80,14 @@ uint8 UTurpAbilitySystemBlueprintFL::RollDie(int Count, int Type)
 	}
 	
 	int DieRollResult = 0;
-	for (int i = 0; i < Count; ++i)
+	for (int i = 0; i < FMath::Abs(Count); ++i)
 	{
 		DieRollResult += UKismetMathLibrary::RandomInteger(Type) + 1;
 	}
-	return DieRollResult;
+	return Count >= 0 ? DieRollResult : -DieRollResult;
 }
 
-uint8 UTurpAbilitySystemBlueprintFL::RollDie(FDice Dice)
+int UTurpAbilitySystemBlueprintFL::RollDie(const FDice Dice)
 {
 	return RollDie(Dice.Count, Dice.Type);
 }
