@@ -12,7 +12,6 @@ void UOverlayWidgetController::Init()
 
 void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityTag)
 {
-	// TODO: Decide which ability based on Tag
-	
-	CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent)->ActivateGameplayAbility(AbilityTag);
+	// TODO: Get the active ASC from the Turn based manager and activate the ability for that.
+	// CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent)->ActivateGameplayAbility(AbilityTag);
 }

@@ -15,15 +15,15 @@ AEnemyCharacter::AEnemyCharacter()
 	AttributeSet = CreateDefaultSubobject<UTurpAttributeSet>("AttributeSet");
 }
 
-int32 AEnemyCharacter::GetPlayerLevel_Implementation()
-{
-	return Level;
-}
+// int32 AEnemyCharacter::GetPlayerLevel_Implementation()
+// {
+// 	return Level;
+// }
 
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	InitAbilityActorInfo();
+	//InitAbilityActorInfo();
 }
 
 void AEnemyCharacter::InitAbilityActorInfo()

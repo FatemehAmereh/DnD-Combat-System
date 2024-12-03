@@ -17,8 +17,8 @@ class TURP_API ATurpHUD : public AHUD
 {
 	GENERATED_BODY()
 public:
-	void InitHUD(UAbilitySystemComponent* ASC);
-	UOverlayWidgetController* GetOverlayWidgetController(UAbilitySystemComponent* ASC);
+	void InitHUD();
+	UOverlayWidgetController* GetOverlayWidgetController();
 	
 private:
 	UPROPERTY()

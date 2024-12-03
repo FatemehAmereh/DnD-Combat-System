@@ -13,22 +13,24 @@ class UAbilitySystemComponent;
  * 
  */
 UCLASS()
-class TURP_API ATurpPlayerState : public APlayerState, public IAbilitySystemInterface
+class TURP_API ATurpPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 public:
-	ATurpPlayerState();
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	UAttributeSet* GetAttributeSet() const;
-	int32 GetPlayerLevel() const;
-	
-protected:
-	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
-	
-	UPROPERTY()
-	int32 Level;
+// 	ATurpPlayerState();
+// 	UAbilitySystemComponent* GetAbilitySystemComponentWithIndex(const int32 PartyMemberIndex) const;
+// 	UAttributeSet* GetAttributeSet(const int32 PartyMemberIndex) const;
+// 	int32 GetPlayerLevel(const int32 PartyMemberIndex) const;
+// 	
+// protected:
+// 	UPROPERTY()
+// 	TArray<TObjectPtr<UAbilitySystemComponent>> AbilitySystemComponents;
+//
+// 	UPROPERTY()
+// 	TArray<TObjectPtr<UAttributeSet>> AttributeSets;
+// 	
+// 	UPROPERTY()
+// 	TArray<int32> Levels;
+//
+// 	int32 PartyCount = 2;
 };

@@ -6,21 +6,20 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
-void ATurpHUD::InitHUD(UAbilitySystemComponent* ASC)
+void ATurpHUD::InitHUD()
 {
 	OverlayWidget = CreateWidget<UTurpUserWidget>(GetWorld(), OverlayWidgetClass);
 	OverlayWidget->AddToViewport();
 	
-	OverlayWidgetController = GetOverlayWidgetController(ASC);
+	OverlayWidgetController = GetOverlayWidgetController();
 	OverlayWidgetController->Init();
 }
 
-UOverlayWidgetController* ATurpHUD::GetOverlayWidgetController(UAbilitySystemComponent* ASC)
+UOverlayWidgetController* ATurpHUD::GetOverlayWidgetController()
 {
 	if(!OverlayWidgetController)
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetAbilitySystemComponent(ASC);
 	}
 	return OverlayWidgetController;
 }

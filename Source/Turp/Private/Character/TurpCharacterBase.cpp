@@ -7,7 +7,7 @@
 #include "GameplayEffect.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 
-ATurpCharacterBase::  ATurpCharacterBase()
+ATurpCharacterBase::ATurpCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
@@ -22,10 +22,15 @@ FVector ATurpCharacterBase::GetCombatSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation("AttackSocket");
 }
 
+// void ATurpCharacterBase::SetPartyIndex(const int32 Index)
+// {
+// 	PartyIndex = Index;
+// }
+
 void ATurpCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	InitAbilityActorInfo();
 }
 
 void ATurpCharacterBase::InitAbilityActorInfo()

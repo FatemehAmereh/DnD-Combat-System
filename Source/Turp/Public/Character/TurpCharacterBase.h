@@ -22,6 +22,8 @@ public:
 	ATurpCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual FVector GetCombatSocketLocation_Implementation() override;
+	//void SetPartyIndex(const int32 Index);
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,10 +38,14 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartUpGameplayAbilities;
+
+	virtual void InitAbilityActorInfo();
 	
 	void InitializeDefaultAttributes() const;
 	void InitializeStartupAbilities() const;
+
+	//int32 PartyIndex = 0;
+
 private:
-	virtual void InitAbilityActorInfo();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 };

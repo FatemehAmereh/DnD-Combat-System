@@ -4,7 +4,9 @@
 #include "Character/TurpCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "Game/TurpGameStateBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/TurpPlayerController.h"
 #include "Player/TurpPlayerState.h"
 #include "UI/HUD/TurpHUD.h"
@@ -18,41 +20,50 @@ ATurpCharacter::ATurpCharacter()
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false; 
+	bUseControllerRotationRoll = false;
 }
 
-int32 ATurpCharacter::GetPlayerLevel_Implementation()
+void ATurpCharacter::SetDefaultAbilitySystemVariables(UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
-	const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>();
-	return TurpPlayerState->GetPlayerLevel();
+	AbilitySystemComponent = ASC;
+	AttributeSet = AS;
 }
+
+void ATurpCharacter::SetAbilitySystemComponentOwnerActor(AActor* ASCOwner)
+{
+	AbilitySystemComponentOwner = ASCOwner;
+}
+
+// int32 ATurpCharacter::GetPlayerLevel_Implementation()
+// {
+// 	const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>();
+// 	return TurpPlayerState->GetPlayerLevel(PartyIndex);
+// }
 
 void ATurpCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	InitAbilityActorInfo();
+	//InitAbilityActorInfo();
 }
 
 void ATurpCharacter::InitAbilityActorInfo()
 {
-	if(const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>())
-	{
-		AttributeSet = TurpPlayerState->GetAttributeSet();
-		AbilitySystemComponent = TurpPlayerState->GetAbilitySystemComponent();
-
-		// This will automatically register the attribute set with the ability system on this actor.
-		AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
-
-		if(const auto PlayerController = GetController<ATurpPlayerController>())
-		{
-			if(const auto HUD = PlayerController->GetHUD<ATurpHUD>())
-			{
-				HUD->InitHUD(AbilitySystemComponent);
-			}
-		}
-	
-		InitializeDefaultAttributes();
-		InitializeStartupAbilities();
-	}
+	AbilitySystemComponent->InitAbilityActorInfo(AbilitySystemComponentOwner, this);
+	InitializeDefaultAttributes();
+	InitializeStartupAbilities();
 }
+
+// void ATurpCharacter::InitAbilityActorInfo()
+// {
+// 	if(const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this)))
+// 	{
+// 		AttributeSet = GameState->GetAttributeSet(PartyIndex);
+// 		AbilitySystemComponent = GameState->GetAbilitySystemComponentWithIndex(PartyIndex);
+//
+// 		// This will automatically register the attribute set with the ability system on this actor.
+// 		
+// 	}
+// 	// const auto TurnBasedManager = GetWorld()->GetGameInstance()->GetSubsystem<UTurnBasedManager>();
+// 	// check(TurnBasedManager);
+// }

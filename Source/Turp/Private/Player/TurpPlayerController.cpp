@@ -9,6 +9,7 @@
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/HUD/TurpHUD.h"
 
 void ATurpPlayerController::BeginPlay()
 {
@@ -27,6 +28,11 @@ void ATurpPlayerController::BeginPlay()
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
+
+	if(const auto HUD = GetHUD<ATurpHUD>())
+	{
+		HUD->InitHUD();
+	}
 }
 
 void ATurpPlayerController::SetupInputComponent()

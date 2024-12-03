@@ -6,8 +6,3 @@
 void UTurpWidgetController::Init()
 {
 }
-
-void UTurpWidgetController::SetAbilitySystemComponent(UAbilitySystemComponent* ASC)
-{
-	AbilitySystemComponent = ASC;
-}

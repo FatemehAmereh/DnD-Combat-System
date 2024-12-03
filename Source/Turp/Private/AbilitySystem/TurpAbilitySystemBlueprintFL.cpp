@@ -21,9 +21,9 @@ UOverlayWidgetController* UTurpAbilitySystemBlueprintFL::GetOverlayWidgetControl
 	{
 		if(auto HUD = PlayerController->GetHUD<ATurpHUD>())
 		{
-			auto ASC = PlayerController->GetPlayerState<ATurpPlayerState>()->GetAbilitySystemComponent();
-			check(ASC);
-			return HUD->GetOverlayWidgetController(ASC);
+			//auto ASC = PlayerController->GetPlayerState<ATurpPlayerState>()->GetAbilitySystemComponent();
+			//check(ASC);
+			return HUD->GetOverlayWidgetController();
 		}
 	}
 
