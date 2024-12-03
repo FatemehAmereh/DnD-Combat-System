@@ -36,23 +36,23 @@ void ATurpCharacter::PossessedBy(AController* NewController)
 
 void ATurpCharacter::InitAbilityActorInfo()
 {
-	const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>();
-	check(TurpPlayerState);
-	
-	AttributeSet = TurpPlayerState->GetAttributeSet();
-	AbilitySystemComponent = TurpPlayerState->GetAbilitySystemComponent();
-
-	// This will automatically register the attribute set with the ability system on this actor.
-	AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
-
-	if(auto PlayerController = GetController<ATurpPlayerController>())
+	if(const auto TurpPlayerState = GetPlayerState<ATurpPlayerState>())
 	{
-		if(auto HUD = PlayerController->GetHUD<ATurpHUD>())
+		AttributeSet = TurpPlayerState->GetAttributeSet();
+		AbilitySystemComponent = TurpPlayerState->GetAbilitySystemComponent();
+
+		// This will automatically register the attribute set with the ability system on this actor.
+		AbilitySystemComponent->InitAbilityActorInfo(TurpPlayerState, this);
+
+		if(const auto PlayerController = GetController<ATurpPlayerController>())
 		{
-			HUD->InitHUD(AbilitySystemComponent);
+			if(const auto HUD = PlayerController->GetHUD<ATurpHUD>())
+			{
+				HUD->InitHUD(AbilitySystemComponent);
+			}
 		}
-	}
 	
-	InitializeDefaultAttributes();
-	InitializeStartupAbilities();
+		InitializeDefaultAttributes();
+		InitializeStartupAbilities();
+	}
 }

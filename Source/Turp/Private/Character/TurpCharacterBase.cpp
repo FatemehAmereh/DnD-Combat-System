@@ -7,7 +7,7 @@
 #include "GameplayEffect.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 
-ATurpCharacterBase::ATurpCharacterBase()
+ATurpCharacterBase::  ATurpCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
