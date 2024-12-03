@@ -13,8 +13,6 @@ void UOverlayWidgetController::Init()
 
 void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityTag)
 {
-	// TODO: Get the active ASC from the Turn based manager and activate the ability for that.
 	const auto ActiveASC = CastChecked<UTurpAbilitySystemComponent>(TurnBasedManager->GetActivePartyMembersAbilitySystemComponent());
 	ActiveASC->ActivateGameplayAbility(AbilityTag);
-	// CastChecked<UTurpAbilitySystemComponent>(AbilitySystemComponent)->ActivateGameplayAbility(AbilityTag);
 }

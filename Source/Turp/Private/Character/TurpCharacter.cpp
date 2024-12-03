@@ -4,12 +4,7 @@
 #include "Character/TurpCharacter.h"
 
 #include "AbilitySystemComponent.h"
-#include "Game/TurpGameStateBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Player/TurpPlayerController.h"
-#include "Player/TurpPlayerState.h"
-#include "UI/HUD/TurpHUD.h"
 
 ATurpCharacter::ATurpCharacter()
 {
@@ -53,17 +48,3 @@ void ATurpCharacter::InitAbilityActorInfo()
 	InitializeDefaultAttributes();
 	InitializeStartupAbilities();
 }
-
-// void ATurpCharacter::InitAbilityActorInfo()
-// {
-// 	if(const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this)))
-// 	{
-// 		AttributeSet = GameState->GetAttributeSet(PartyIndex);
-// 		AbilitySystemComponent = GameState->GetAbilitySystemComponentWithIndex(PartyIndex);
-//
-// 		// This will automatically register the attribute set with the ability system on this actor.
-// 		
-// 	}
-// 	// const auto TurnBasedManager = GetWorld()->GetGameInstance()->GetSubsystem<UTurnBasedManager>();
-// 	// check(TurnBasedManager);
-// }

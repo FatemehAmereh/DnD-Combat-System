@@ -23,7 +23,6 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//InitAbilityActorInfo();
 }
 
 void AEnemyCharacter::InitAbilityActorInfo()
