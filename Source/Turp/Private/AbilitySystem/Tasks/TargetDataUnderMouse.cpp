@@ -17,7 +17,8 @@ UTargetDataUnderMouse* UTargetDataUnderMouse::GetTargetDataUnderMouse(UGameplayA
 
 void UTargetDataUnderMouse::Activate()
 {
-	PlayerController = Cast<ATurpPlayerController>(Ability->GetActorInfo().PlayerController);
+	PlayerController = Cast<ATurpPlayerController>(
+		UGameplayStatics::GetPlayerController(AbilitySystemComponent->GetAvatarActor(), 0));
 	PlayerController->AbilityActionTriggered.AddDynamic(this, &UTargetDataUnderMouse::InputCallBack);
 }
 

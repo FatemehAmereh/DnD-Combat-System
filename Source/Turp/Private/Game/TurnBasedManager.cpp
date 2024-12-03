@@ -8,6 +8,8 @@
 #include "Character/EnemyCharacter.h"
 #include "Character/TurpCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/HUD/TurpHUD.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 
 ATurnBasedManager::ATurnBasedManager()
 {
@@ -29,6 +31,11 @@ ATurnBasedManager::ATurnBasedManager()
 
 		PartyMembers.Add(CharacterInfo);
 	}
+}
+
+UAbilitySystemComponent* ATurnBasedManager::GetActivePartyMembersAbilitySystemComponent() const
+{
+	return PartyMembers[ActivePartyMemberIndex].ASC;
 }
 
 void ATurnBasedManager::BeginPlay()
@@ -64,7 +71,10 @@ void ATurnBasedManager::BeginPlay()
 		Enemies.Add(Enemy);
 	}
 
-	UGameplayStatics::GetPlayerController(this, 0)->Possess(PartyMembers[ActivePartyMemberIndex].Character);
+	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	PlayerController->Possess(PartyMembers[ActivePartyMemberIndex].Character);
+	const auto OverlayWidgetController = PlayerController->GetHUD<ATurpHUD>()->GetOverlayWidgetController();
+	OverlayWidgetController->SetTurnBasedManager(this);
 }
 //
 // UAbilitySystemComponent* ATurnBasedManager::GetAbilitySystemComponentWithIndex(const int32 PartyMemberIndex) const

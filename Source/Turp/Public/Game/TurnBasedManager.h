@@ -34,7 +34,8 @@ class TURP_API ATurnBasedManager : public AActor
 	
 public:	
 	ATurnBasedManager();
-
+	UAbilitySystemComponent* GetActivePartyMembersAbilitySystemComponent() const;
+	
 	int32 ActivePartyMemberIndex = 0;
 	
 	// Character and Enemy Data.
