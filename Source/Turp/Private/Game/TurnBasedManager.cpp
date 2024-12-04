@@ -3,6 +3,7 @@
 
 #include "Game/TurnBasedManager.h"
 
+#include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "AbilitySystem/TurpAttributeSet.h"
 #include "Character/EnemyCharacter.h"
@@ -15,7 +16,8 @@ ATurnBasedManager::ATurnBasedManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// Party Ability System Initialization.
+	// Party Ability System Initialization:
+	//   Creating Ability System Components and Attribute Sets for Party Characters.
 	for (int i = 0; i < PartyCount; ++i)
 	{
 		FCharacterInfo CharacterInfo;
@@ -24,7 +26,8 @@ ATurnBasedManager::ATurnBasedManager()
 		ASC->SetIsReplicated(true);
 		ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 		CharacterInfo.ASC = ASC;
-            
+		ASCs.Add(ASC);
+		
 		const auto AS = CreateDefaultSubobject<UTurpAttributeSet>(
 			*FString::Printf(TEXT("AttributeSet%d"), i));
 		CharacterInfo.AS = AS;
@@ -33,16 +36,11 @@ ATurnBasedManager::ATurnBasedManager()
 	}
 }
 
-UAbilitySystemComponent* ATurnBasedManager::GetActivePartyMembersAbilitySystemComponent() const
-{
-	return PartyMembers[ActivePartyMemberIndex].ASC;
-}
-
 void ATurnBasedManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Party Initialization.
+	
+	// Create Party Characters.
 	for (int i = 0; i < PartyCount; ++i)
 	{
 		const auto PartyMember = GetWorld()->SpawnActorDeferred<ATurpCharacter>(
@@ -56,8 +54,14 @@ void ATurnBasedManager::BeginPlay()
 		PartyMember->SetDefaultAbilitySystemVariables(PartyMembers[i].ASC, PartyMembers[i].AS);
 		PartyMember->FinishSpawning(PartySpawnLocation->GetTransform());
 		PartyMembers[i].Character = PartyMember;
+	
+		// Roll Initiative.
+		// TODO: Use the UTurpAbilitySystemBlueprintFL::MakeActionCheck To roll.
+		PartyMembers[i].Initiative =
+				UTurpAbilitySystemBlueprintFL::RollDie(1, 20) +
+				Cast<UTurpAttributeSet>(PartyMembers[i].AS)->GetDexterityMod();
 	}
-
+	
 	// Enemy Initialization.
 	for (int i = 0; i < EnemyCount; ++i)
 	{
@@ -70,19 +74,44 @@ void ATurnBasedManager::BeginPlay()
 		Enemy->FinishSpawning(EnemySpawnLocation->GetTransform());
 		Enemies.Add(Enemy);
 	}
+	
+	PartyMembers.Sort([](const FCharacterInfo& A, const FCharacterInfo& B)
+	{
+		return A.Initiative < B.Initiative;
+	});
+	
+	// Set Active Character.
+	PossessNewCharacter();
+	
+	SetUIReference();
+}
 
+void ATurnBasedManager::ChangeTurn()
+{
+	ActivePartyMemberIndex++;
+	
+	// TODO: When AI works, have a queue of party and enemy characters and check the size of that.
+	if(ActivePartyMemberIndex >= PartyMembers.Num())
+	{
+		ActivePartyMemberIndex = 0;
+	}
+	PossessNewCharacter();
+}
+
+void ATurnBasedManager::PossessNewCharacter()
+{
 	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	PlayerController->Possess(PartyMembers[ActivePartyMemberIndex].Character);
+}
+
+void ATurnBasedManager::SetUIReference()
+{
+	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	const auto OverlayWidgetController = PlayerController->GetHUD<ATurpHUD>()->GetOverlayWidgetController();
 	OverlayWidgetController->SetTurnBasedManager(this);
 }
-//
-// UAbilitySystemComponent* ATurnBasedManager::GetAbilitySystemComponentWithIndex(const int32 PartyMemberIndex) const
-// {
-// 	return PartyAbilitySystemComponents[PartyMemberIndex];
-// }
-//
-// UAttributeSet* ATurnBasedManager::GetAttributeSet(const int32 PartyMemberIndex) const
-// {
-// 	return PartyAttributeSets[PartyMemberIndex];
-// }
+
+UAbilitySystemComponent* ATurnBasedManager::GetActivePartyMembersAbilitySystemComponent() const
+{
+	return PartyMembers[ActivePartyMemberIndex].ASC;
+}

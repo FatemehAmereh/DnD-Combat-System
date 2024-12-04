@@ -13,6 +13,7 @@ void ATurpHUD::InitHUD()
 	
 	OverlayWidgetController = GetOverlayWidgetController();
 	OverlayWidgetController->Init();
+	OverlayWidget->SetWidgetController(OverlayWidgetController);
 }
 
 UOverlayWidgetController* ATurpHUD::GetOverlayWidgetController()

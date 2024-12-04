@@ -8,11 +8,16 @@
 
 void UOverlayWidgetController::Init()
 {
-	AbilityIconPressed.AddDynamic(this, &UOverlayWidgetController::OnAbilityIconPressed);
+	//AbilityIconPressed.AddDynamic(this, &UOverlayWidgetController::OnAbilityIconPressed);
 }
 
 void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityTag)
 {
 	const auto ActiveASC = CastChecked<UTurpAbilitySystemComponent>(TurnBasedManager->GetActivePartyMembersAbilitySystemComponent());
 	ActiveASC->ActivateGameplayAbility(AbilityTag);
+}
+
+void UOverlayWidgetController::OnChangeTurnPressed()
+{
+	TurnBasedManager->ChangeTurn();
 }

@@ -21,10 +21,13 @@ struct FCharacterInfo
 	TObjectPtr<ATurpCharacterBase> Character;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UAbilitySystemComponent> ASC;
+	UAbilitySystemComponent* ASC;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UAttributeSet> AS;
+	UAttributeSet* AS;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int Initiative;
 };
 
 UCLASS()
@@ -34,13 +37,12 @@ class TURP_API ATurnBasedManager : public AActor
 	
 public:	
 	ATurnBasedManager();
+	void ChangeTurn();
 	UAbilitySystemComponent* GetActivePartyMembersAbilitySystemComponent() const;
-	
-	int32 ActivePartyMemberIndex = 0;
 	
 	// Character and Enemy Data.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
-	int32 PartyCount = 1;
+	int32 PartyCount = 5;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
 	TSubclassOf<ATurpCharacter> PartyCharacterClass;
@@ -62,7 +64,15 @@ protected:
 	TArray<FCharacterInfo> PartyMembers;
 
 	UPROPERTY(BlueprintReadOnly)
+	TArray<UAbilitySystemComponent*> ASCs;
+
+	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<ATurpCharacterBase>> Enemies;
 	
 	virtual void BeginPlay() override;
+	
+private:
+	int32 ActivePartyMemberIndex = 0;
+	void PossessNewCharacter();
+	void SetUIReference();
 };

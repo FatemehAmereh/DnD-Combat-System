@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "OverlayWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityIconPress, const FGameplayTag&, AbilityTag);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityIconPress, const FGameplayTag&, AbilityTag);
 
 /**
  * 
@@ -19,10 +19,13 @@ class TURP_API UOverlayWidgetController : public UTurpWidgetController
 public:
 	virtual void Init() override;
 
-	UPROPERTY(BlueprintCallable)
-	FAbilityIconPress AbilityIconPressed;
+	//UPROPERTY(BlueprintCallable)
+	//FAbilityIconPress AbilityIconPressed;
 	
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnAbilityIconPressed(const FGameplayTag& AbilityTag);
+
+	UFUNCTION(BlueprintCallable)
+	void OnChangeTurnPressed();
 };

@@ -25,11 +25,6 @@ class TURP_API UTurpAbilitySystemBlueprintFL : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	/// UI
-	UFUNCTION(BlueprintPure, Category="TurpAbilitySystemBlueprintFunctionLibrary|WidgetController" )
-	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
-	///
-	
 	/// Combat Packet Update.
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC);
