@@ -15,34 +15,27 @@
 ATurnBasedManager::ATurnBasedManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
-	// Party Ability System Initialization:
-	//   Creating Ability System Components and Attribute Sets for Party Characters.
-	for (int i = 0; i < PartyCount; ++i)
-	{
-		FCharacterInfo CharacterInfo;
-		const auto ASC = CreateDefaultSubobject<UTurpAbilitySystemComponent>(
-			*FString::Printf(TEXT("AbilitySystemComponent%d"), i));
-		ASC->SetIsReplicated(true);
-		ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
-		CharacterInfo.ASC = ASC;
-		ASCs.Add(ASC);
-		
-		const auto AS = CreateDefaultSubobject<UTurpAttributeSet>(
-			*FString::Printf(TEXT("AttributeSet%d"), i));
-		CharacterInfo.AS = AS;
-
-		PartyMembers.Add(CharacterInfo);
-	}
 }
 
 void ATurnBasedManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// Create Party Characters.
+
+	// Party Initialization.
+	PartyMembers.Empty();
 	for (int i = 0; i < PartyCount; ++i)
 	{
+		// Create Ability System Components and Attribute Sets.
+		FCharacterInfo CharacterInfo;
+		const auto ASC = NewObject<UTurpAbilitySystemComponent>(this, UTurpAbilitySystemComponent::StaticClass());
+		ASC->SetIsReplicated(true);
+		ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+		ASC->RegisterComponent();
+		CharacterInfo.ASC = ASC;
+
+		CharacterInfo.AS = NewObject<UTurpAttributeSet>(this, UTurpAttributeSet::StaticClass());
+		
+		// Create Characters.
 		const auto PartyMember = GetWorld()->SpawnActorDeferred<ATurpCharacter>(
 			PartyCharacterClass,
 			PartySpawnLocation->GetTransform(),
@@ -51,15 +44,17 @@ void ATurnBasedManager::BeginPlay()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
-		PartyMember->SetDefaultAbilitySystemVariables(PartyMembers[i].ASC, PartyMembers[i].AS);
+		PartyMember->SetDefaultAbilitySystemVariables(CharacterInfo.ASC, CharacterInfo.AS);
 		PartyMember->FinishSpawning(PartySpawnLocation->GetTransform());
-		PartyMembers[i].Character = PartyMember;
+		CharacterInfo.Character = PartyMember;
 	
 		// Roll Initiative.
 		// TODO: Use the UTurpAbilitySystemBlueprintFL::MakeActionCheck To roll.
-		PartyMembers[i].Initiative =
+		CharacterInfo.Initiative =
 				UTurpAbilitySystemBlueprintFL::RollDie(1, 20) +
-				Cast<UTurpAttributeSet>(PartyMembers[i].AS)->GetDexterityMod();
+				Cast<UTurpAttributeSet>(CharacterInfo.AS)->GetDexterityMod();
+
+		PartyMembers.Add(CharacterInfo);
 	}
 	
 	// Enemy Initialization.

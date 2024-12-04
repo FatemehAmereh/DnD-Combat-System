@@ -18,16 +18,16 @@ struct FCharacterInfo
 	GENERATED_BODY()
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<ATurpCharacterBase> Character;
+	TObjectPtr<ATurpCharacterBase> Character = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAbilitySystemComponent* ASC;
+	TObjectPtr<UAbilitySystemComponent> ASC = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAttributeSet* AS;
+	TObjectPtr<UAttributeSet> AS = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int Initiative;
+	int Initiative = 0;
 };
 
 UCLASS()
