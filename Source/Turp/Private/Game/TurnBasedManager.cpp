@@ -34,18 +34,20 @@ void ATurnBasedManager::BeginPlay()
 		CharacterInfo.ASC = ASC;
 
 		CharacterInfo.AS = NewObject<UTurpAttributeSet>(this, UTurpAttributeSet::StaticClass());
-		
+
+		FTransform SpawnTransform = PartySpawnLocation->GetTransform();
+		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + FVector(0, i * 100, 0));
 		// Create Characters.
 		const auto PartyMember = GetWorld()->SpawnActorDeferred<ATurpCharacter>(
 			PartyCharacterClass,
-			PartySpawnLocation->GetTransform(),
+			SpawnTransform,
 			this,
 			nullptr,
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
 		PartyMember->SetDefaultAbilitySystemVariables(CharacterInfo.ASC, CharacterInfo.AS);
-		PartyMember->FinishSpawning(PartySpawnLocation->GetTransform());
+		PartyMember->FinishSpawning(SpawnTransform);
 		CharacterInfo.Character = PartyMember;
 	
 		// Roll Initiative.
