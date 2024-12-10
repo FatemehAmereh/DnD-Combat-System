@@ -19,16 +19,18 @@ void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityT
 	ActiveASC->ActivateGameplayAbility(AbilityTag);
 }
 
-void UOverlayWidgetController::OnChangeTurnPressed()
+FGameplayTagContainer UOverlayWidgetController::OnChangeTurnPressed()
 {
 	TurnBasedManager->ChangeTurn();
-
+	
 	// TODO: Change available abilities on the UI for the active ASC.
 	const auto ActiveASC = TurnBasedManager->GetActivePartyMembersAbilitySystemComponent();
 
+	FGameplayTagContainer AbilityTagContainer;
 	for (const auto& AbilitySpec : ActiveASC->GetActivatableAbilities())
 	{
 		const auto& AbilityTag = Cast<UTurpGameplayAbility>(AbilitySpec.Ability)->GetAbilityTag();
-		// TODO: Search in the data asset for right info and populate the widget ability bar with it.
+		AbilityTagContainer.AddTag(AbilityTag);
 	}
+	return AbilityTagContainer;
 }

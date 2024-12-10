@@ -9,6 +9,7 @@
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityIconPress, const FGameplayTag&, AbilityTag);
 
+struct FGameplayAbilitySpec;
 /**
  * 
  */
@@ -27,5 +28,5 @@ private:
 	void OnAbilityIconPressed(const FGameplayTag& AbilityTag);
 
 	UFUNCTION(BlueprintCallable)
-	void OnChangeTurnPressed();
+	FGameplayTagContainer OnChangeTurnPressed();
 };
