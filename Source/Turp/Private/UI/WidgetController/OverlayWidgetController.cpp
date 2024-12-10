@@ -19,18 +19,25 @@ void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityT
 	ActiveASC->ActivateGameplayAbility(AbilityTag);
 }
 
-FGameplayTagContainer UOverlayWidgetController::OnChangeTurnPressed()
+void UOverlayWidgetController::OnChangeTurnPressed()
 {
 	TurnBasedManager->ChangeTurn();
-	
-	// TODO: Change available abilities on the UI for the active ASC.
+}
+
+TArray<FGameplayTag> UOverlayWidgetController::GetActiveCharacterAbilityTags()
+{
 	const auto ActiveASC = TurnBasedManager->GetActivePartyMembersAbilitySystemComponent();
 
-	FGameplayTagContainer AbilityTagContainer;
+	TArray<FGameplayTag> AbilityTags;
 	for (const auto& AbilitySpec : ActiveASC->GetActivatableAbilities())
 	{
 		const auto& AbilityTag = Cast<UTurpGameplayAbility>(AbilitySpec.Ability)->GetAbilityTag();
-		AbilityTagContainer.AddTag(AbilityTag);
+		AbilityTags.Add(AbilityTag);
 	}
-	return AbilityTagContainer;
+	return AbilityTags;
+}
+
+void UOverlayWidgetController::SetTurnBasedManager(ATurnBasedManager* TBManager)
+{
+	TurnBasedManager = TBManager;
 }

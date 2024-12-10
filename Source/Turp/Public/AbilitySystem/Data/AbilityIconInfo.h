@@ -7,6 +7,8 @@
 #include "Engine/DataAsset.h"
 #include "AbilityIconInfo.generated.h"
 
+class UPaperSprite;
+
 USTRUCT(BlueprintType)
 struct FAbilityIconData
 {
@@ -17,7 +19,7 @@ struct FAbilityIconData
 	FText Text;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> Image;
+	TObjectPtr<UPaperSprite> Image;
 };
 
 /**
@@ -31,4 +33,8 @@ class TURP_API UAbilityIconInfo : public UDataAsset
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability Icon Information")
 	TMap<FGameplayTag, FAbilityIconData> AbilityIconInformation;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FAbilityIconData GetAbilityIconInfoWithTag(const FGameplayTag& Tag);
 };

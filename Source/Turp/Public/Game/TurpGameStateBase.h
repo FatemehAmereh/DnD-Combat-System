@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/ConditionInfo.h"
+#include "AbilitySystem/Data/AbilityIconInfo.h"
 #include "AbilitySystem/TurpAbilityTypes.h"
 #include "AbilitySystem/Data/EffectInfo.h"
 #include "GameFramework/GameStateBase.h"
@@ -35,6 +36,9 @@ public:
 	// From Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UEffectInfo> GameplayEffectInformation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
+	TObjectPtr<UAbilityIconInfo> AbilityIconInformation;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TSubclassOf<UGameplayEffect> DefaultDamageGameplayEffect;
