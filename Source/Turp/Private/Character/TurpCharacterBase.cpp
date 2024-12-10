@@ -22,6 +22,11 @@ FVector ATurpCharacterBase::GetCombatSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation("AttackSocket");
 }
 
+// TArray<TSubclassOf<UGameplayAbility>> ATurpCharacterBase::GetStartUpAbilities() const
+// {
+// 	return StartUpGameplayAbilities;
+// }
+
 // void ATurpCharacterBase::SetPartyIndex(const int32 Index)
 // {
 // 	PartyIndex = Index;

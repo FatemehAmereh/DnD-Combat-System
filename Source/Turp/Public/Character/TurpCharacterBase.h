@@ -22,6 +22,7 @@ public:
 	ATurpCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual FVector GetCombatSocketLocation_Implementation() override;
+	//TArray<TSubclassOf<UGameplayAbility>> GetStartUpAbilities() const;
 	//void SetPartyIndex(const int32 Index);
 	
 protected:
