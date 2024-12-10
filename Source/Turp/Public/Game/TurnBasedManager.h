@@ -41,8 +41,8 @@ public:
 	UAbilitySystemComponent* GetActivePartyMembersAbilitySystemComponent() const;
 	
 	// Character and Enemy Data.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
-	int32 PartyCount = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets|Characters")
+	int32 PartyCount = 3;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
 	TSubclassOf<ATurpCharacter> PartyCharacterClass;
