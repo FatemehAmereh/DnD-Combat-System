@@ -44,7 +44,7 @@ public:
 	
 	/// Gameplay Effect
 	static void ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex);
-	static void ReapplyActiveGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayTag& EffectTag, UTurpAbilitySystemComponent* ASC);
+	static void ReapplyActiveGameplayEffect(const ATurpGameStateBase& GameState, const FGameplayTag& EffectTag, const FEffectStackElement& EffectStackElement, UTurpAbilitySystemComponent* TargetASC);
 	
 	UFUNCTION(BlueprintCallable, Category="TurpAbilitySystemBlueprintFunctionLibrary|CombatPacket" )
 	static void ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState);
@@ -62,7 +62,7 @@ public:
 private:
 	// Return true if target succeeds the saving throw and returns the SpellSaveDC for the condition.
 	static TTuple<bool, uint8> MakeSavingThrow(const FGameplayTag& SavingThrowTag, const ATurpGameStateBase& GameState,
-		const UTurpAbilitySystemComponent* TargetASC, const UTurpAttributeSet* SourceAS = nullptr, const uint8 PreRecordedSaveDC = 0,
+		const UTurpAbilitySystemComponent* TargetASC, const UTurpAttributeSet* SourceAS, const uint8 PreRecordedSaveDC,
 		const UTurpAttributeSet* TargetAS, FString& DebugMsg);
 	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag);
 
@@ -72,6 +72,4 @@ private:
 
 	static uint8 MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC, const ATurpGameStateBase& GameState);
 	static EActionEnum GetActionEnumForTag(const FGameplayTag& SavingThrowTag);
-
-	static void ApplyDamage(const ATurpGameStateBase& GameState, UTurpAbilitySystemComponent* TargetASC);
 };

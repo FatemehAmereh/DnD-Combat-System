@@ -78,7 +78,7 @@ int UTurpAbilitySystemBlueprintFL::RollDie(const FDice Dice)
 	return RollDie(Dice.Count, Dice.Type);
 }
 
-void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex)
+void UTurpAbilitySystemBlueprintFL:: ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex)
 {
 	// 1. Apply Effect:
 	//		Do the dmg
@@ -119,7 +119,8 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		// 1. Needed to do a saving throw and either
 		//		Failed the saving throw or
 		//		Saved the saving throw but still takes half damage
-		// 2. Got hit
+		// 2. Needed attack roll and got hit
+		// 3. Automatically hit
 		const bool TakeDamageBasedOnSavingThrow = NeedsSavingThrow && (!SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess));
 		if(IsHit || TakeDamageBasedOnSavingThrow)
 		{
@@ -135,9 +136,6 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			const auto spec = SourceASC->MakeOutgoingSpec(GameState.DefaultDamageGameplayEffect, 1, ContextHandle);
 			spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
 			
-			// How to grant tags
-			// spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
-			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
@@ -148,7 +146,7 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	// Apply condition.
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
-		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
+		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
 		const bool SucceededSavingThrow = SavingThrowResult.Key;
 		ConditionSpellSaveDC = SavingThrowResult.Value;
 		if(!SucceededSavingThrow)
@@ -168,13 +166,59 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	}
 }
 
-void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayTag& EffectTag,
-	UTurpAbilitySystemComponent* ASC)
+void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameStateBase& GameState, const FGameplayTag& EffectTag, const FEffectStackElement& EffectStackElement,
+	UTurpAbilitySystemComponent* TargetASC)
 {
-	const auto EffectInfo = GameState->GameplayEffectInformation->GetEffectInfoWithTag(EffectTag);
+	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
+	const auto EffectInfo = GameState.GameplayEffectInformation->GetEffectInfoWithTag(EffectTag);
+	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	
 	if(EffectInfo->Damage.DoesDamage && EffectInfo->Damage.ApplyDamageEveryTurn)
 	{
-		
+		// Reapply Damage
+		bool SucceededSavingThrow = false;
+		const bool NeedsSavingThrow = EffectInfo->Damage.SavingThrowTag == FGameplayTag::EmptyTag ? false : true;
+		bool IsHit = false;
+		if(NeedsSavingThrow)
+		{
+			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, TargetASC,
+			nullptr, EffectStackElement.DamageSaveDC, TargetAttributeSet, DebugMsg);
+			SucceededSavingThrow = SavingThrowResult.Key;
+		}
+
+		if(NeedsSavingThrow && (!SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)))
+		{
+			const bool TakeDamageBasedOnSavingThrow = NeedsSavingThrow && (!SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess));
+			if(IsHit || TakeDamageBasedOnSavingThrow)
+			{
+				int8 DamageRoll = RollDie(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
+				if(SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)
+				{
+					DamageRoll *= 0.5f;
+				}
+				DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectInfo->Damage.Dice.Count,EffectInfo->Damage.Dice.Type, DamageRoll);
+				const auto SourceASC = GameState.CombatPacket.SourceASC;
+				auto ContextHandle = SourceASC->MakeEffectContext();
+				ContextHandle.AddSourceObject(SourceASC);
+				const auto spec = SourceASC->MakeOutgoingSpec(GameState.DefaultDamageGameplayEffect, 1, ContextHandle);
+				spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
+			
+				SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
+			}
+			UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
+		}
+	}
+
+	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
+	{
+		// Check if the granted Effect should be removed.
+		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, nullptr, EffectStackElement.ConditionSpellSaveDC, TargetAttributeSet, DebugMsg);
+		const bool SucceededSavingThrow = SavingThrowResult.Key;
+		if(SucceededSavingThrow)
+		{
+			// Remove Effect.
+			TargetASC->RemoveEffect(EffectTag, 1);
+		}
 	}
 }
 
@@ -214,8 +258,9 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 		// Saving throw Fail.
 		DebugMsg += TEXT("SavingThrow Failed! ");
 	}
-	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"), StaticCast<int>(SourceAS.GetSpellSaveDC()), SaveRoll, DiceRoll, SavingThrowModifier);
-	return {IsSuccess, SourceAS->GetSpellSaveDC()};
+	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"),
+		StaticCast<int>(SaveDC), SaveRoll, DiceRoll, SavingThrowModifier);
+	return {IsSuccess, SaveDC};
 }
 
 bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& GameState,const UTurpAbilitySystemComponent& TargetASC,
@@ -336,39 +381,6 @@ EActionEnum UTurpAbilitySystemBlueprintFL::GetActionEnumForTag(const FGameplayTa
 
 	UE_LOG(Turp, Error, TEXT("SavingThrow tag of this ability is invalid! Can't retrieve saving throw mod from AS."))
 	return EActionEnum::ConST;
-}
-
-void UTurpAbilitySystemBlueprintFL::ApplyDamage(const ATurpGameStateBase& GameState, UTurpAbilitySystemComponent* TargetASC)
-{
-	const auto EffectInfo = GameState.GameplayEffectInformation->GetEffectInfoWithTag(AbilityProperties.AbilityTag);
-	const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, *TargetASC,
-			*SourceAttributeSet, *TargetAttributeSet, DebugMsg);
-	const bool IsHit = MakeAttackRoll(GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
-		
-	// Target should take damage if it:
-	// 1. Failed the saving throw
-	// 2. Saved the saving throw but still takes half damage.
-	// 3. Got hit.
-	if(IsHit || !SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess))
-	{
-		int8 DamageRoll = RollDie(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
-		if(SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)
-		{
-			DamageRoll *= 0.5f;
-		}
-		DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectInfo->Damage.Dice.Count,EffectInfo->Damage.Dice.Type, DamageRoll);
-		const auto SourceASC = GameState.CombatPacket.SourceASC;
-		auto ContextHandle = SourceASC->MakeEffectContext();
-		ContextHandle.AddSourceObject(SourceASC);
-		const auto spec = SourceASC->MakeOutgoingSpec(GameState.DefaultDamageGameplayEffect, 1, ContextHandle);
-		spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
-			
-		// How to grant tags
-		// spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
-			
-		SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
-	}
-	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 }
 
 float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,

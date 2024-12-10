@@ -34,8 +34,10 @@ public:
 
 	void AddCondition(const FGameplayTag& ConditionTag);
 	void RemoveCondition(const FGameplayTag& ConditionTag);
+	void RemoveConditionsForEffect(const FGameplayTag& EffectTag);
 
 	void AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack, const uint8 DamageSaveDC, const bool ConditionApplied, const uint8 ConditionSpellSaveDC);
+	void RemoveEffect(const FGameplayTag& EffectTag, const int StackToRemove);
 	void OnTurnEnded();
 	
 protected:
