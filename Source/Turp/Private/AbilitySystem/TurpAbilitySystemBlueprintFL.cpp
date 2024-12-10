@@ -14,6 +14,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/TurpPlayerState.h"
 #include "UI/HUD/TurpHUD.h"
+#include "WorkflowOrientedApp/WorkflowTabManager.h"
 
 void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC)
 {
@@ -94,18 +95,33 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 
 	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
 
+	uint8 DamageSaveDC = 0;
 	// Do Damage.
 	if(EffectInfo->Damage.DoesDamage)
 	{
-		const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, *TargetASC,
-			*SourceAttributeSet, *TargetAttributeSet, DebugMsg);
-		const bool IsHit = MakeAttackRoll(GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		bool SucceededSavingThrow = false;
+		const bool NeedsSavingThrow = EffectInfo->Damage.SavingThrowTag == FGameplayTag::EmptyTag ? false : true;
+		bool IsHit = false;
+		if(NeedsSavingThrow)
+		{
+			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, TargetASC,
+			SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
+			SucceededSavingThrow = SavingThrowResult.Key;
+			DamageSaveDC = SavingThrowResult.Value;
+		}
+		else
+		{
+			IsHit = MakeAttackRoll(GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);	
+		}
+		
 		
 		// Target should take damage if it:
-		// 1. Failed the saving throw
-		// 2. Saved the saving throw but still takes half damage.
-		// 3. Got hit.
-		if(IsHit || !SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess))
+		// 1. Needed to do a saving throw and either
+		//		Failed the saving throw or
+		//		Saved the saving throw but still takes half damage
+		// 2. Got hit
+		const bool TakeDamageBasedOnSavingThrow = NeedsSavingThrow && (!SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess));
+		if(IsHit || TakeDamageBasedOnSavingThrow)
 		{
 			int8 DamageRoll = RollDie(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
 			if(SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)
@@ -127,25 +143,41 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
+	bool ConditionApplied = false;
+	uint8 ConditionSpellSaveDC = 0;
 	// Apply condition.
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
-		const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
+		const bool SucceededSavingThrow = SavingThrowResult.Key;
+		ConditionSpellSaveDC = SavingThrowResult.Value;
 		if(!SucceededSavingThrow)
 		{
 			for (const auto& ConditionTag : EffectInfo->Condition.TagsToGrant)
 			{
 				TargetASC->AddCondition(ConditionTag);
 			}
+			ConditionApplied = true;
 		}
 	}
 
 	// Add Effect to active Effect stack on Target if it has duration.
 	if(EffectInfo->Duration != 0)
 	{
-		TargetASC->AddEffect(AbilityProperties.AbilityTag, EffectInfo->Duration, EffectInfo->CanStack);
+		TargetASC->AddEffect(AbilityProperties.AbilityTag, EffectInfo->Duration, EffectInfo->CanStack, DamageSaveDC, ConditionApplied, ConditionSpellSaveDC);
 	}
 }
+
+void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameStateBase* GameState, const FGameplayTag& EffectTag,
+	UTurpAbilitySystemComponent* ASC)
+{
+	const auto EffectInfo = GameState->GameplayEffectInformation->GetEffectInfoWithTag(EffectTag);
+	if(EffectInfo->Damage.DoesDamage && EffectInfo->Damage.ApplyDamageEveryTurn)
+	{
+		
+	}
+}
+
 
 void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(const ATurpGameStateBase* GameState)
 {
@@ -155,22 +187,23 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToAllTargets(const ATurpG
 	}
 }
 
-bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingThrowTag, const ATurpGameStateBase& GameState,
-	const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS,
+TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingThrowTag, const ATurpGameStateBase& GameState,
+	const UTurpAbilitySystemComponent* TargetASC, const UTurpAttributeSet* SourceAS, const uint8 PreRecordedSaveDC, const UTurpAttributeSet* TargetAS,
 	FString& DebugMsg)
 {
 	if(SavingThrowTag == FGameplayTag::EmptyTag)
 	{
 		// No need for saving throw. This Effect doesn't require one.
-		return false;
+		return {false, 0};
 	}
 	
 	bool IsSuccess = false;
-	const uint8 DiceRoll = MakeActionCheck(GetActionEnumForTag(SavingThrowTag), TargetASC, GameState);
-	const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(TargetAS, SavingThrowTag));
+	const uint8 DiceRoll = MakeActionCheck(GetActionEnumForTag(SavingThrowTag), *TargetASC, GameState);
+	const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(*TargetAS, SavingThrowTag));
 	const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
-			
-	if(SaveRoll > SourceAS.GetSpellSaveDC())
+
+	const uint8 SaveDC = SourceAS ? SourceAS->GetSpellSaveDC() : PreRecordedSaveDC;
+	if(SaveRoll > SaveDC)
 	{
 		// Saving throw success.
 		DebugMsg += TEXT("SavingThrow succeded! ");
@@ -182,7 +215,7 @@ bool UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGameplayTag& SavingTh
 		DebugMsg += TEXT("SavingThrow Failed! ");
 	}
 	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"), StaticCast<int>(SourceAS.GetSpellSaveDC()), SaveRoll, DiceRoll, SavingThrowModifier);
-	return IsSuccess;
+	return {IsSuccess, SourceAS->GetSpellSaveDC()};
 }
 
 bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& GameState,const UTurpAbilitySystemComponent& TargetASC,
@@ -303,6 +336,39 @@ EActionEnum UTurpAbilitySystemBlueprintFL::GetActionEnumForTag(const FGameplayTa
 
 	UE_LOG(Turp, Error, TEXT("SavingThrow tag of this ability is invalid! Can't retrieve saving throw mod from AS."))
 	return EActionEnum::ConST;
+}
+
+void UTurpAbilitySystemBlueprintFL::ApplyDamage(const ATurpGameStateBase& GameState, UTurpAbilitySystemComponent* TargetASC)
+{
+	const auto EffectInfo = GameState.GameplayEffectInformation->GetEffectInfoWithTag(AbilityProperties.AbilityTag);
+	const bool SucceededSavingThrow = MakeSavingThrow(EffectInfo->Damage.SavingThrowTag, GameState, *TargetASC,
+			*SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+	const bool IsHit = MakeAttackRoll(GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);
+		
+	// Target should take damage if it:
+	// 1. Failed the saving throw
+	// 2. Saved the saving throw but still takes half damage.
+	// 3. Got hit.
+	if(IsHit || !SucceededSavingThrow || (SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess))
+	{
+		int8 DamageRoll = RollDie(EffectInfo->Damage.Dice.Count, EffectInfo->Damage.Dice.Type);
+		if(SucceededSavingThrow && EffectInfo->Damage.TakeHalfDamageOnSuccess)
+		{
+			DamageRoll *= 0.5f;
+		}
+		DebugMsg += FString::Printf(TEXT("Damage (%dd%d): %d\n"), EffectInfo->Damage.Dice.Count,EffectInfo->Damage.Dice.Type, DamageRoll);
+		const auto SourceASC = GameState.CombatPacket.SourceASC;
+		auto ContextHandle = SourceASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(SourceASC);
+		const auto spec = SourceASC->MakeOutgoingSpec(GameState.DefaultDamageGameplayEffect, 1, ContextHandle);
+		spec.Data->SetSetByCallerMagnitude(FTurpTagsManager::Get().DamageModifier, -DamageRoll);
+			
+		// How to grant tags
+		// spec.Data->DynamicGrantedTags.AddTag(FTurpTagsManager::Get().SavingThrow_Charisma);
+			
+		SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
+	}
+	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 }
 
 float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,

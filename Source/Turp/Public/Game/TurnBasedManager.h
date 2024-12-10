@@ -37,7 +37,7 @@ class TURP_API ATurnBasedManager : public AActor
 	
 public:	
 	ATurnBasedManager();
-	void ChangeTurn();
+	void EndTurn();
 	UAbilitySystemComponent* GetActivePartyMembersAbilitySystemComponent() const;
 	
 	// Character and Enemy Data.
@@ -62,9 +62,6 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FCharacterInfo> PartyMembers;
-
-	UPROPERTY(BlueprintReadOnly)
-	TArray<UAbilitySystemComponent*> ASCs;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<ATurpCharacterBase>> Enemies;

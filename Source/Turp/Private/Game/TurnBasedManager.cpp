@@ -83,18 +83,27 @@ void ATurnBasedManager::BeginPlay()
 	SetUIReference();
 }
 
-void ATurnBasedManager::ChangeTurn()
+void ATurnBasedManager::EndTurn()
 {
 	ActivePartyMemberIndex++;
-	
+
+	// TODO: Update active Effect and Tags list.
+	for (const auto& PartyMember : PartyMembers)
+	{
+		const auto ASC = Cast<UTurpAbilitySystemComponent>(PartyMember.ASC);
+		ASC->OnTurnEnded();
+	}
+	for (const auto& Enemy : Enemies)
+	{
+		Cast<UTurpAbilitySystemComponent>(Enemy->GetAbilitySystemComponent())->OnTurnEnded();
+	}
+
 	// TODO: When AI works, have a queue of party and enemy characters and check the size of that.
 	if(ActivePartyMemberIndex >= PartyMembers.Num())
 	{
 		ActivePartyMemberIndex = 0;
 	}
 	PossessNewCharacter();
-
-	// TODO: Update active Effect and Tags list.
 }
 
 void ATurnBasedManager::PossessNewCharacter()

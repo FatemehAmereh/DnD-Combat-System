@@ -21,7 +21,7 @@ void UOverlayWidgetController::OnAbilityIconPressed(const FGameplayTag& AbilityT
 
 void UOverlayWidgetController::OnChangeTurnPressed()
 {
-	TurnBasedManager->ChangeTurn();
+	TurnBasedManager->EndTurn();
 }
 
 TArray<FGameplayTag> UOverlayWidgetController::GetActiveCharacterAbilityTags()

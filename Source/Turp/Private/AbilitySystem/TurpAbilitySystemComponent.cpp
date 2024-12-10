@@ -82,7 +82,7 @@ void UTurpAbilitySystemComponent::RemoveCondition(const FGameplayTag& ConditionT
 	SetLooseGameplayTagCount(ConditionTag, CurrentStackCount - 1);
 }
 
-void UTurpAbilitySystemComponent::AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack)
+void UTurpAbilitySystemComponent::AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack, const uint8 DamageSaveDC,  const bool ConditionApplied, const uint8 ConditionSpellSaveDC)
 {
 	if(EffectTag == FGameplayTag::EmptyTag)
 	{
@@ -105,7 +105,45 @@ void UTurpAbilitySystemComponent::AddEffect(const FGameplayTag& EffectTag, const
 	}
 	else
 	{
-		ActiveEffectStack.Add(EffectTag, {Duration, 1});	
+		ActiveEffectStack.Add(EffectTag, {Duration, 1, DamageSaveDC, ConditionApplied, ConditionSpellSaveDC});	
+	}
+}
+
+void UTurpAbilitySystemComponent::OnTurnEnded()
+{
+	TArray<FGameplayTag> EffectsToRemove;
+	for (auto& EffectStack : ActiveEffectStack)
+	{
+		EffectStack.Value.DurationLeft--;
+
+		// Effect's duration has ended.
+		if(EffectStack.Value.DurationLeft <= 0)
+		{
+			// Remove granted conditions.
+			const auto GameState = CastChecked<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
+			const auto EffectInfo = GameState->GameplayEffectInformation->GetEffectInfoWithTag(EffectStack.Key);
+			if(!EffectInfo->Condition.TagsToGrant.IsEmpty() && EffectStack.Value.ConditionGranted)
+			{
+				for (const auto& ConditionTag : EffectInfo->Condition.TagsToGrant)
+				{
+					RemoveCondition(ConditionTag);
+				}
+			}
+			
+			// Mark effect for removal.
+			EffectsToRemove.Add(EffectStack.Key);
+		}
+		else
+		{
+			// TODO: 1. Apply damage per turn  2. Make a save for
+			
+		}
+	}
+
+	// Remove effects whose duration ended.
+	for (const auto& ToRemove : EffectsToRemove)
+	{
+		ActiveEffectStack.Remove(ToRemove);
 	}
 }
 

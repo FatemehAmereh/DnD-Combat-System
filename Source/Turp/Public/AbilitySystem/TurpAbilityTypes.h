@@ -178,4 +178,13 @@ struct FEffectStackElement
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	uint8 StackCount;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 DamageSaveDC = 0;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	bool ConditionGranted = false;
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	uint8 ConditionSpellSaveDC = 0;
 };
