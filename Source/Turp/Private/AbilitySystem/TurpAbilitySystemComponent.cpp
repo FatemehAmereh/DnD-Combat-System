@@ -74,35 +74,12 @@ void UTurpAbilitySystemComponent::AddCondition(const FGameplayTag& ConditionTag)
 	{
 		SetLooseGameplayTagCount(ConditionTag, CurrentStackCount + 1);
 	}
-	// if(const auto ActiveConditionTag = ActiveConditionStack.Find(ConditionTag))
-	// {
-	// 	*ActiveConditionTag = *ActiveConditionTag + 1;
-	// }
-	// else
-	// {
-	// 	ActiveConditionStack.Add(ConditionTag, 1);
-	// 	
-	// }
 }
 
 void UTurpAbilitySystemComponent::RemoveCondition(const FGameplayTag& ConditionTag)
 {
 	const int CurrentStackCount = GetGameplayTagCount(ConditionTag);
 	SetLooseGameplayTagCount(ConditionTag, CurrentStackCount - 1);
-	
-	// if(const auto ActiveConditionTag = ActiveConditionStack.Find(ConditionTag))
-	// {
-	// 	*ActiveConditionTag = *ActiveConditionTag - 1;
-	// 	if(*ActiveConditionTag <= 0)
-	// 	{
-	// 		ActiveConditionStack.Remove(ConditionTag);
-	// 	}
-	// }
-	// else
-	// {
-	// 	UE_LOG(Turp, Error, TEXT("%s"), *FString("[AbilitySystemComponent] Cannot remove condition. "
-	// 									 "Condition doesn't exist on stack."));
-	// }
 }
 
 void UTurpAbilitySystemComponent::AddEffect(const FGameplayTag& EffectTag, const uint8 Duration, const bool CanStack)

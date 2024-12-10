@@ -93,10 +93,13 @@ void ATurnBasedManager::ChangeTurn()
 		ActivePartyMemberIndex = 0;
 	}
 	PossessNewCharacter();
+
+	// TODO: Update active Effect and Tags list.
 }
 
 void ATurnBasedManager::PossessNewCharacter()
 {
+	// TODO: Fix the rotation issue.
 	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	PlayerController->Possess(PartyMembers[ActivePartyMemberIndex].Character);
 }

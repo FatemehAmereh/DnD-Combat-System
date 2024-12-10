@@ -42,7 +42,6 @@ protected:
 	TMap<EActionEnum , FActionStatusInfo> ConditionActionStack;
 
 	TMap<FGameplayTag, FEffectStackElement> ActiveEffectStack;
-	TMap<FGameplayTag, uint8> ActiveConditionStack;
 
 private:
 	// Condition tag callbacks; Called whenever a tag is added for the first time or removed.
