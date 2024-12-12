@@ -4,6 +4,7 @@
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AsyncTreeDifferences.h"
 #include "TurpTagsManager.h"
 #include "TurpUtilities.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
@@ -138,6 +139,7 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
+		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
 	bool ConditionApplied = false;
@@ -145,10 +147,21 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	// Apply condition.
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
-		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
-		const bool SucceededSavingThrow = SavingThrowResult.Key;
-		ConditionSpellSaveDC = SavingThrowResult.Value;
-		if(!SucceededSavingThrow)
+		bool ApplyCondition = false;
+		if(EffectInfo->Condition.SavingThrowTag == FGameplayTag::EmptyTag)
+		{
+			// Automatically apply the condition.
+			ApplyCondition = true;
+		}
+		else
+		{
+			// [IsSuccess, SaveDC]
+			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
+			ApplyCondition = !SavingThrowResult.Key;
+			ConditionSpellSaveDC = SavingThrowResult.Value;
+		}
+		
+		if(ApplyCondition)
 		{
 			for (const auto& ConditionTag : EffectInfo->Condition.TagsToGrant)
 			{
@@ -156,9 +169,8 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 			}
 			ConditionApplied = true;
 		}
+		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
-
-	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	
 	// Add Effect to active Effect stack on Target if it has duration.
 	if(EffectInfo->Duration != 0)
@@ -207,21 +219,24 @@ void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameS
 				SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 			}
 		}
+		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
-		// Check if the granted Effect should be removed.
-		const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, nullptr, EffectStackElement.ConditionSpellSaveDC, TargetAttributeSet, DebugMsg);
-		const bool SucceededSavingThrow = SavingThrowResult.Key;
-		if(SucceededSavingThrow)
+		if(EffectInfo->Condition.SavingThrowTag != FGameplayTag::EmptyTag)
 		{
-			// Remove Effect.
-			TargetASC->RemoveEffect(EffectTag, 1);
+			// Check if the granted Effect should be removed.
+			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, nullptr, EffectStackElement.ConditionSpellSaveDC, TargetAttributeSet, DebugMsg);
+			const bool SucceededSavingThrow = SavingThrowResult.Key;
+			if(SucceededSavingThrow)
+			{
+				// Remove Effect.
+				TargetASC->RemoveEffect(EffectTag, 1);
+			}
+			UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 		}
 	}
-
-	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 }
 
 

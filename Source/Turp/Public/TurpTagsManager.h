@@ -27,6 +27,7 @@ struct FTurpTagsManager
 	FGameplayTag Ability_Fireball;
 	FGameplayTag Ability_Blindness;
 	FGameplayTag Ability_RayOfSickness;
+	FGameplayTag Ability_Bless;
 	
 	// Gameplay Event
 	FGameplayTag GameplayEvent_StartTrace;
@@ -35,11 +36,12 @@ struct FTurpTagsManager
 	FGameplayTag Condition_Blind;
 	FGameplayTag Condition_Prone;
 	FGameplayTag Condition_Poisoned;
+	// Non-standard Conditions such as Bless that gives 1d4 to all saves and AtkRolls.
+	FGameplayTag Condition_Ability_Bless;
 
 	// Damage modifier tag used in default GameplayEffect asset for applying damage.
 	FGameplayTag DamageModifier;
-	
-	FGameplayTagContainer ConditionActionTags;
+
 private:
 	static FTurpTagsManager GameplayTags;
 };

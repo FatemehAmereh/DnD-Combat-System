@@ -14,10 +14,11 @@ UENUM(BlueprintType)
 enum class EActionEnum
 {
 	// TODO: Add AttributeModifiers as well.
-	AtkRoll, StrST, DexST, ConST, IntST, WisST, ChaST, 
+	AtkRoll, StrST, DexST, ConST, IntST, WisST, ChaST, StrMod, DexMod, ConMod, IntMod, WisMod, ChaMod, Health
 };
-const TArray<EActionEnum> ConditionActionList{ EActionEnum::AtkRoll, EActionEnum::StrST, EActionEnum::DexST, EActionEnum::ConST,
-												   EActionEnum::IntST, EActionEnum::WisST, EActionEnum::ChaST};
+const TArray<EActionEnum> ConditionActionList{ EActionEnum::AtkRoll, EActionEnum::StrST, EActionEnum::DexST,
+	EActionEnum::ConST, EActionEnum::IntST, EActionEnum::WisST, EActionEnum::ChaST, EActionEnum::StrMod,
+	EActionEnum::DexMod,EActionEnum::ConMod, EActionEnum::IntMod, EActionEnum::WisMod, EActionEnum::ChaMod, EActionEnum::Health};
 
 UENUM(BlueprintType)
 enum class EStatusEnum

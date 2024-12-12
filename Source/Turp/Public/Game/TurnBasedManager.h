@@ -42,7 +42,7 @@ public:
 	
 	// Character and Enemy Data.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets|Characters")
-	int32 PartyCount = 3;
+	int32 PartyCount = 2;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
 	TSubclassOf<ATurpCharacter> PartyCharacterClass;

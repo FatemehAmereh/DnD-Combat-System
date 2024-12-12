@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
+#include "Character/TurpCharacterBase.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/TurpPlayerController.h"
@@ -26,9 +27,8 @@ void UTargetDataUnderMouse::InputCallBack()
 {
 	FHitResult HitResult;
 	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	auto ASC = Cast<UAbilitySystemComponent>(
-		HitResult.GetActor()->GetComponentByClass(UAbilitySystemComponent::StaticClass()));
 	
+	auto ASC = Cast<ATurpCharacterBase>(HitResult.GetActor())->GetAbilitySystemComponent();
 	MouseTargetData.Broadcast(FTurpAbilityTargetData{ASC, HitResult.Location});
 	EndTask();
 }

@@ -23,7 +23,6 @@ void ATurnBasedManager::BeginPlay()
 	Super::BeginPlay();
 
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-	const auto WizardInfo = GameState->CharacterClassInformation->CharacterClassInformation[0];
 	
 	// Party Initialization.
 	PartyMembers.Empty();
@@ -50,7 +49,7 @@ void ATurnBasedManager::BeginPlay()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
-		PartyMember->SetDefaultProperties(CharacterInfo.ASC, CharacterInfo.AS, WizardInfo);
+		PartyMember->SetDefaultProperties(CharacterInfo.ASC, CharacterInfo.AS, GameState->CharacterClassInformation->CharacterClassInformation[i]);
 		PartyMember->FinishSpawning(SpawnTransform);
 		CharacterInfo.Character = PartyMember;
 	

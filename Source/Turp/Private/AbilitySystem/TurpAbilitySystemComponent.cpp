@@ -43,11 +43,11 @@ void UTurpAbilitySystemComponent::AddCharacterAbility(const TSubclassOf<UGamepla
 
 void UTurpAbilitySystemComponent::InitializeConditionActions()
 {
-	// atkroll, dexst, ...
+	// AtkRoll, DexST, ...
 	for (const auto& ConditionAction : ConditionActionList)
 	{
 		FActionStatusInfo ActionStatusStruct;
-		// adv, disadv, ...
+		// Adv, Disadv, ...
 		 for (const auto& ActionStatus : ActionStatusList)
 		 {
 		 	FGameplayTagContainer ConditionTags;
@@ -151,6 +151,7 @@ void UTurpAbilitySystemComponent::RemoveEffect(const FGameplayTag& EffectTag, co
 void UTurpAbilitySystemComponent::OnTurnEnded()
 {
 	TArray<FGameplayTag> EffectsToRemove;
+	// TODO: Fix the exception thrown when the ActiveEffectStack map is empty.
 	for (auto& EffectStack : ActiveEffectStack)
 	{
 		EffectStack.Value.DurationLeft--;
