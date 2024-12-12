@@ -37,11 +37,11 @@ void UProjectileAbility::SpawnProjectile(const int TargetIndex)
 		auto Projectile = GetWorld()->SpawnActorDeferred<ATurpProjectile>(
 			ProjectileClass,
 			SpawnTransform,
-			GetOwningActorFromActorInfo(),
-			Cast<APawn>(GetOwningActorFromActorInfo()),
+			GetAvatarActorFromActorInfo(),
+			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		Projectile->SetTargetIndex(0);
+		Projectile->SetTargetIndex(TargetIndex);
 		Projectile->SetApplyEffect(true);
 		if(DisableOverlap)
 		{

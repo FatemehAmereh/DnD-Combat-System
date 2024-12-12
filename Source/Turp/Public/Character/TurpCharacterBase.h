@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "TurpCharacterBase.generated.h"
@@ -22,8 +23,6 @@ public:
 	ATurpCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual FVector GetCombatSocketLocation_Implementation() override;
-	//TArray<TSubclassOf<UGameplayAbility>> GetStartUpAbilities() const;
-	//void SetPartyIndex(const int32 Index);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -40,12 +39,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartUpGameplayAbilities;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
+	ECharacterClassTypes CharacterClass;
+	
 	virtual void InitAbilityActorInfo();
 	
 	void InitializeDefaultAttributes() const;
 	void InitializeStartupAbilities() const;
-
-	//int32 PartyIndex = 0;
 
 private:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;

@@ -10,6 +10,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "TurpGameStateBase.generated.h"
 
+class UCharacterClassInfo;
 class AEnemyCharacter;
 class UAttributeSet;
 class ATurpCharacter;
@@ -37,9 +38,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UEffectInfo> GameplayEffectInformation;
 
+	// From Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UAbilityIconInfo> AbilityIconInformation;
 
+	// From Data Asset.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|CharacterClassInfo")
+	TObjectPtr<UCharacterClassInfo> CharacterClassInformation;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TSubclassOf<UGameplayEffect> DefaultDamageGameplayEffect;
 

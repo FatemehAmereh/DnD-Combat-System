@@ -78,7 +78,7 @@ int UTurpAbilitySystemBlueprintFL::RollDie(const FDice Dice)
 	return RollDie(Dice.Count, Dice.Type);
 }
 
-void UTurpAbilitySystemBlueprintFL:: ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex)
+void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameStateBase& GameState, const uint8 TargetIndex)
 {
 	// 1. Apply Effect:
 	//		Do the dmg
@@ -138,7 +138,6 @@ void UTurpAbilitySystemBlueprintFL:: ApplyGameplayEffectToTarget(const ATurpGame
 			
 			SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 		}
-		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
 
 	bool ConditionApplied = false;
@@ -159,6 +158,8 @@ void UTurpAbilitySystemBlueprintFL:: ApplyGameplayEffectToTarget(const ATurpGame
 		}
 	}
 
+	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
+	
 	// Add Effect to active Effect stack on Target if it has duration.
 	if(EffectInfo->Duration != 0)
 	{
@@ -205,7 +206,6 @@ void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameS
 			
 				SourceASC->ApplyGameplayEffectSpecToTarget(*spec.Data, TargetASC);
 			}
-			UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 		}
 	}
 
@@ -220,6 +220,8 @@ void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameS
 			TargetASC->RemoveEffect(EffectTag, 1);
 		}
 	}
+
+	UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 }
 
 
@@ -247,7 +249,7 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 	const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
 
 	const uint8 SaveDC = SourceAS ? SourceAS->GetSpellSaveDC() : PreRecordedSaveDC;
-	if(SaveRoll > SaveDC)
+	if(SaveRoll >= SaveDC)
 	{
 		// Saving throw success.
 		DebugMsg += TEXT("SavingThrow succeded! ");
@@ -258,7 +260,7 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 		// Saving throw Fail.
 		DebugMsg += TEXT("SavingThrow Failed! ");
 	}
-	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d= %d(1d20) + %d(STMod)\n"),
+	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d = %d(1d20) + %d(STMod)\n"),
 		StaticCast<int>(SaveDC), SaveRoll, DiceRoll, SavingThrowModifier);
 	return {IsSuccess, SaveDC};
 }
@@ -273,18 +275,18 @@ bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& Gam
 	const uint8 AttackRoll = DiceRoll + BonusMods;
 	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
 			
-	if(AC > AttackRoll)
-	{
-		// Attack Miss!
-		DebugMsg += TEXT("Attack Miss! ");
-	}
-	else
+	if(AttackRoll >= AC)
 	{
 		// Attack Hit!
 		DebugMsg += TEXT("Attack Hit! ");
 		IsHit = true;
 	}
-	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d= %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
+	else
+	{
+		// Attack Miss!
+		DebugMsg += TEXT("Attack Miss! ");
+	}
+	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d = %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
 	return IsHit;
 }
 

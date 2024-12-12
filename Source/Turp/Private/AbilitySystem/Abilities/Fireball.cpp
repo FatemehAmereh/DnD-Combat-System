@@ -21,12 +21,12 @@ void UFireball::SpawnProjectile(const int TargetIndex)
 	auto ProjectileTarget = GetWorld()->SpawnActorDeferred<AProjectileTargetActor>(
 		ProjectileTargetClass,
 		ProjectileTargetSpawnTransform,
-		GetOwningActorFromActorInfo(),
-		Cast<APawn>(GetOwningActorFromActorInfo()),
+		GetAvatarActorFromActorInfo(),
+		Cast<APawn>(GetAvatarActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
 	ProjectileTarget->FinishSpawning(ProjectileTargetSpawnTransform);
-
+	
 	// Projectile
 	FTransform ProjectileSpawnTransform;
 	ProjectileSpawnTransform.SetLocation(SocketLocation);
@@ -35,8 +35,8 @@ void UFireball::SpawnProjectile(const int TargetIndex)
 	auto Projectile = GetWorld()->SpawnActorDeferred<ATurpProjectile>(
 		ProjectileClass,
 		ProjectileSpawnTransform,
-		GetOwningActorFromActorInfo(),
-		Cast<APawn>(GetOwningActorFromActorInfo()),
+		GetAvatarActorFromActorInfo(),
+		Cast<APawn>(GetAvatarActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	Projectile->SetTarget(ProjectileTarget);

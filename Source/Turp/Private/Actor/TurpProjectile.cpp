@@ -70,7 +70,7 @@ void ATurpProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 		{
 			TargetActor->Destroy();
 			const FGameplayEventData Payload;
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Owner, FTurpTagsManager::Get().GameplayEvent_StartTrace, Payload);
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), FTurpTagsManager::Get().GameplayEvent_StartTrace, Payload);
 		}
 		Destroy();
 	}

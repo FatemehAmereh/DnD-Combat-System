@@ -13,8 +13,8 @@ class UGameplayAbility;
 UENUM(BlueprintType)
 enum class EActionEnum
 {
-	// TODO: Add AttributeModifers as well.
-	AtkRoll, StrST, DexST, ConST, IntST, WisST, ChaST
+	// TODO: Add AttributeModifiers as well.
+	AtkRoll, StrST, DexST, ConST, IntST, WisST, ChaST, 
 };
 const TArray<EActionEnum> ConditionActionList{ EActionEnum::AtkRoll, EActionEnum::StrST, EActionEnum::DexST, EActionEnum::ConST,
 												   EActionEnum::IntST, EActionEnum::WisST, EActionEnum::ChaST};

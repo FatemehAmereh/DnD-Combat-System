@@ -17,7 +17,7 @@ class TURP_API ATurpCharacter : public ATurpCharacterBase
 
 public:
 	ATurpCharacter();
-	void SetDefaultAbilitySystemVariables(UAbilitySystemComponent* ASC, UAttributeSet* AS);
+	void SetDefaultProperties(UAbilitySystemComponent* ASC, UAttributeSet* AS, const FCharacterClassData CharacterClassInformation);
 	void SetAbilitySystemComponentOwnerActor(AActor* ASCOwner);
 	// virtual int32 GetPlayerLevel_Implementation() override;
 	

@@ -18,10 +18,14 @@ ATurpCharacter::ATurpCharacter()
 	bUseControllerRotationRoll = false;
 }
 
-void ATurpCharacter::SetDefaultAbilitySystemVariables(UAbilitySystemComponent* ASC, UAttributeSet* AS)
+void ATurpCharacter::SetDefaultProperties(UAbilitySystemComponent* ASC, UAttributeSet* AS,
+	const FCharacterClassData CharacterClassInformation)
 {
 	AbilitySystemComponent = ASC;
 	AttributeSet = AS;
+	DefaultPrimaryAttributesEffect = CharacterClassInformation.DefaultPrimaryAttributesEffect;
+	StartUpGameplayAbilities = CharacterClassInformation.StartUpGameplayAbilities;
+	CharacterClass = CharacterClassInformation.CharacterClass;
 }
 
 void ATurpCharacter::SetAbilitySystemComponentOwnerActor(AActor* ASCOwner)

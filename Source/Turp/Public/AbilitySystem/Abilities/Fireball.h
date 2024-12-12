@@ -17,7 +17,7 @@ class TURP_API UFireball : public UProjectileAbility
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Fireball")
+	UPROPERTY(EditDefaultsOnly, Category="Ability Settings|Projectile")
 	TSubclassOf<AProjectileTargetActor> ProjectileTargetClass;
 
 	UPROPERTY(BlueprintReadWrite)

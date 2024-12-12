@@ -48,7 +48,7 @@ public:
 	TSubclassOf<ATurpCharacter> PartyCharacterClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
-	int32 EnemyCount = 1;
+	int32 EnemyCount = 2;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|Characters")
 	TSubclassOf<AEnemyCharacter> EnemyCharacterClass;

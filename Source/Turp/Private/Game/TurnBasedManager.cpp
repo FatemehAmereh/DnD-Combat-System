@@ -6,6 +6,7 @@
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "AbilitySystem/TurpAttributeSet.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/EnemyCharacter.h"
 #include "Character/TurpCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,6 +22,9 @@ void ATurnBasedManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
+	const auto WizardInfo = GameState->CharacterClassInformation->CharacterClassInformation[0];
+	
 	// Party Initialization.
 	PartyMembers.Empty();
 	for (int i = 0; i < PartyCount; ++i)
@@ -46,7 +50,7 @@ void ATurnBasedManager::BeginPlay()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
-		PartyMember->SetDefaultAbilitySystemVariables(CharacterInfo.ASC, CharacterInfo.AS);
+		PartyMember->SetDefaultProperties(CharacterInfo.ASC, CharacterInfo.AS, WizardInfo);
 		PartyMember->FinishSpawning(SpawnTransform);
 		CharacterInfo.Character = PartyMember;
 	
@@ -62,13 +66,15 @@ void ATurnBasedManager::BeginPlay()
 	// Enemy Initialization.
 	for (int i = 0; i < EnemyCount; ++i)
 	{
+		FTransform SpawnTransform = EnemySpawnLocation->GetTransform();
+		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + FVector(0, i * 100, 0));
 		const auto Enemy = GetWorld()->SpawnActorDeferred<AEnemyCharacter>(
 			EnemyCharacterClass,
-			EnemySpawnLocation->GetTransform(),
+			SpawnTransform,
 			this,
 			nullptr,
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		Enemy->FinishSpawning(EnemySpawnLocation->GetTransform());
+		Enemy->FinishSpawning(SpawnTransform);
 		Enemies.Add(Enemy);
 	}
 	
