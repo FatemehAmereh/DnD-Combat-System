@@ -34,9 +34,10 @@ void ATurnBasedManager::BeginPlay()
 		ASC->SetIsReplicated(true);
 		ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 		ASC->RegisterComponent();
+		auto AS = ASC->AddSet<UTurpAttributeSet>();
 		CharacterInfo.ASC = ASC;
 
-		CharacterInfo.AS = NewObject<UTurpAttributeSet>(this, UTurpAttributeSet::StaticClass());
+		//CharacterInfo.AS = NewObject<UTurpAttributeSet>(this, UTurpAttributeSet::StaticClass());
 
 		FTransform SpawnTransform = PartySpawnLocation->GetTransform();
 		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + FVector(0, i * 100, 0));
@@ -49,7 +50,8 @@ void ATurnBasedManager::BeginPlay()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
-		PartyMember->SetDefaultProperties(CharacterInfo.ASC, CharacterInfo.AS, GameState->CharacterClassInformation->CharacterClassInformation[i]);
+		const auto s = GameState->CharacterClassInformation->CharacterClassInformation[i];
+		PartyMember->SetDefaultProperties(CharacterInfo.ASC, s);
 		PartyMember->FinishSpawning(SpawnTransform);
 		CharacterInfo.Character = PartyMember;
 	
@@ -57,7 +59,7 @@ void ATurnBasedManager::BeginPlay()
 		// TODO: Use the UTurpAbilitySystemBlueprintFL::MakeActionCheck To roll.
 		CharacterInfo.Initiative =
 				UTurpAbilitySystemBlueprintFL::RollDie(1, 20) +
-				Cast<UTurpAttributeSet>(CharacterInfo.AS)->GetDexterityMod();
+				AS->GetDexterityMod();
 
 		PartyMembers.Add(CharacterInfo);
 	}

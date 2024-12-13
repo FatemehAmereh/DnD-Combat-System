@@ -67,8 +67,9 @@ private:
 	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag);
 
 	// Return true if target is Hit by the attack.
-	static bool MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& TargetASC,
-		const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg);
+	static bool MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& SourceASC,
+		const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS,
+		const UTurpAttributeSet& TargetAS, FString& DebugMsg);
 
 	static uint8 MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC, const ATurpGameStateBase& GameState);
 	static EActionEnum GetActionEnumForTag(const FGameplayTag& SavingThrowTag);

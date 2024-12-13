@@ -27,8 +27,9 @@ void UTargetDataUnderMouse::InputCallBack()
 {
 	FHitResult HitResult;
 	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	
-	auto ASC = Cast<ATurpCharacterBase>(HitResult.GetActor())->GetAbilitySystemComponent();
+
+	const auto HitCharacter = Cast<ATurpCharacterBase>(HitResult.GetActor());
+	auto ASC = HitCharacter ? HitCharacter->GetAbilitySystemComponent() : nullptr;
 	MouseTargetData.Broadcast(FTurpAbilityTargetData{ASC, HitResult.Location});
 	EndTask();
 }

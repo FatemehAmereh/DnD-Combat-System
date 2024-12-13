@@ -36,6 +36,8 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 		FName("Ability.RayOfSickness"));
 	GameplayTags.Ability_Bless = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Ability.Bless"));
+	GameplayTags.Ability_HealingWord = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Ability.HealingWord"));
 
 	// Gameplay Event
 	GameplayTags.GameplayEvent_StartTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -50,6 +52,8 @@ void FTurpTagsManager::InitializeNativeGameplayTags()
 		FName("Condition.Poisoned"));
 	GameplayTags.Condition_Ability_Bless = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Condition.Ability.Bless"));
+	GameplayTags.Condition_Ability_HealingWord = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Condition.Ability.HealingWord"));
 
 	GameplayTags.DamageModifier = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("DamageModifier"));

@@ -24,9 +24,6 @@ struct FCharacterInfo
 	TObjectPtr<UAbilitySystemComponent> ASC = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UAttributeSet> AS = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int Initiative = 0;
 };
 

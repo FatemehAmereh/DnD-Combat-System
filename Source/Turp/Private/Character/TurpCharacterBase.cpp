@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
+#include "AbilitySystem/TurpAttributeSet.h"
 
 ATurpCharacterBase::ATurpCharacterBase()
 {
@@ -22,10 +23,25 @@ FVector ATurpCharacterBase::GetCombatSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation("AttackSocket");
 }
 
-// TArray<TSubclassOf<UGameplayAbility>> ATurpCharacterBase::GetStartUpAbilities() const
-// {
-// 	return StartUpGameplayAbilities;
-// }
+float ATurpCharacterBase::GetClassSpecificAttackRollModifier() const
+{
+	const auto AS = Cast<UTurpAttributeSet>(AbilitySystemComponent->GetAttributeSet(UTurpAttributeSet::StaticClass()));
+	if(CharacterClass == ECharacterClassTypes::Wizard)
+	{
+		return Cast<UTurpAttributeSet>(AS)->GetIntelligenceMod();
+	}
+	if(CharacterClass == ECharacterClassTypes::Cleric)
+	{
+		return Cast<UTurpAttributeSet>(AS)->GetWisdomMod();
+	}
+	if(CharacterClass == ECharacterClassTypes::Fighter)
+	{
+		// Should be either Strength or Dexterity based on weapon equipped.
+		return Cast<UTurpAttributeSet>(AS)->GetStrengthMod();
+	}
+	
+	return 0;
+}
 
 // void ATurpCharacterBase::SetPartyIndex(const int32 Index)
 // {
@@ -52,7 +68,7 @@ void ATurpCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
 	
 	// TODO: what is this level exactly
 	auto SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
-	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());;
 }
 
 void ATurpCharacterBase::InitializeDefaultAttributes() const

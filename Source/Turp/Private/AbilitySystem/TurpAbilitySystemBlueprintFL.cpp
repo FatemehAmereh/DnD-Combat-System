@@ -10,6 +10,7 @@
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "AbilitySystem/TurpAttributeSet.h"
 #include "AbilitySystem/TurpGameplayEffect.h"
+#include "Character/TurpCharacterBase.h"
 #include "Game/TurpGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -112,7 +113,9 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		}
 		else
 		{
-			IsHit = MakeAttackRoll(GameState, *TargetASC, *SourceAttributeSet, *TargetAttributeSet, DebugMsg);	
+			const auto SourceASC = Cast<UTurpAbilitySystemComponent>(GameState.CombatPacket.SourceASC);
+			IsHit = MakeAttackRoll(GameState, *SourceASC, *TargetASC, *SourceAttributeSet,
+				*TargetAttributeSet, DebugMsg);	
 		}
 		
 		
@@ -280,13 +283,15 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 	return {IsSuccess, SaveDC};
 }
 
-bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& GameState,const UTurpAbilitySystemComponent& TargetASC,
-	const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg)
+bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& SourceASC,
+	const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg)
 {
 	bool IsHit = false;
 	
 	const uint8 DiceRoll = MakeActionCheck(EActionEnum::AtkRoll, TargetASC, GameState);
-	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + SourceAS.GetIntelligenceMod());
+	auto c = Cast<ATurpCharacterBase>(SourceASC.GetAvatarActor());
+	const float ClassSpecificAttackMod = c->GetClassSpecificAttackRollModifier();
+	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + ClassSpecificAttackMod);
 	const uint8 AttackRoll = DiceRoll + BonusMods;
 	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
 			

@@ -23,7 +23,7 @@ public:
 	ATurpCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual FVector GetCombatSocketLocation_Implementation() override;
-	
+	float GetClassSpecificAttackRollModifier() const;
 protected:
 	virtual void BeginPlay() override;
 

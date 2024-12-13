@@ -30,19 +30,19 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FCombatPacket CombatPacket;
 
-	// From Data Asset.
+	// From ConditionInfo Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UConditionInfo> GameplayConditionInformation;
 
-	// From Data Asset.
+	// From EffectInfo Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UEffectInfo> GameplayEffectInformation;
 
-	// From Data Asset.
+	// From AbilityIcnInfo Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TObjectPtr<UAbilityIconInfo> AbilityIconInformation;
 
-	// From Data Asset.
+	// From CharacterClassInfo Data Asset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|CharacterClassInfo")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInformation;
 	
