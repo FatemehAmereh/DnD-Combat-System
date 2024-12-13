@@ -71,6 +71,7 @@ private:
 		const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS,
 		const UTurpAttributeSet& TargetAS, FString& DebugMsg);
 
-	static uint8 MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC, const ATurpGameStateBase& GameState);
+	static TTuple<bool, uint8> MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& ASC,
+		const ATurpGameStateBase& GameState, FString& DebugMsg);
 	static EActionEnum GetActionEnumForTag(const FGameplayTag& SavingThrowTag);
 };

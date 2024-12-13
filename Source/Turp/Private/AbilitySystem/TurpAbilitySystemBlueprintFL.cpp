@@ -262,7 +262,9 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 	}
 	
 	bool IsSuccess = false;
-	const uint8 DiceRoll = MakeActionCheck(GetActionEnumForTag(SavingThrowTag), *TargetASC, GameState);
+	FString RollDebugMsg = "";	
+	const auto ActionCheck = MakeActionCheck(GetActionEnumForTag(SavingThrowTag), *TargetASC, GameState, RollDebugMsg);
+	const uint8 DiceRoll = ActionCheck.Value;
 	const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(*TargetAS, SavingThrowTag));
 	const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
 
@@ -287,50 +289,67 @@ bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& Gam
 	const UTurpAbilitySystemComponent& TargetASC, const UTurpAttributeSet& SourceAS, const UTurpAttributeSet& TargetAS, FString& DebugMsg)
 {
 	bool IsHit = false;
-	
-	const uint8 DiceRoll = MakeActionCheck(EActionEnum::AtkRoll, TargetASC, GameState);
-	const float ClassSpecificAttackMod = Cast<ATurpCharacterBase>(SourceASC.GetAvatarActor())->GetClassSpecificAttackRollModifier();
-	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + ClassSpecificAttackMod);
-	const uint8 AttackRoll = DiceRoll + BonusMods;
-	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
-			
-	if(AttackRoll >= AC)
+
+	FString RollDebugMsg = "";
+	const auto ActionCheck= MakeActionCheck(EActionEnum::AtkRoll, SourceASC, GameState, RollDebugMsg);
+	if(!ActionCheck.Key)
 	{
-		// Attack Hit!
-		DebugMsg += TEXT("Attack Hit! ");
-		IsHit = true;
+		// Attack Miss!
+		DebugMsg += TEXT("Attack Miss! AttackRoll: ");
+		DebugMsg += RollDebugMsg;
 	}
 	else
 	{
-		// Attack Miss!
-		DebugMsg += TEXT("Attack Miss! ");
+		uint8 DiceRoll = ActionCheck.Value;
+		const float ClassSpecificAttackMod = Cast<ATurpCharacterBase>(SourceASC.GetAvatarActor())->GetClassSpecificAttackRollModifier(RollDebugMsg);
+		const float ProficiencyBonus = static_cast<uint8>(SourceAS.GetProficiencyBonus());
+		RollDebugMsg += FString::Printf(TEXT(" + %d(ProficiencyBonus) "), static_cast<uint8>(ProficiencyBonus));
+		const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + ClassSpecificAttackMod);
+		const uint8 AttackRoll = DiceRoll + BonusMods;
+		const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
+			
+		if(AttackRoll >= AC)
+		{
+			// Attack Hit!
+			DebugMsg += TEXT("Attack Hit! ");
+			IsHit = true;
+		}
+		else
+		{
+			// Attack Miss!
+			DebugMsg += TEXT("Attack Miss! ");
+		}
+		DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d = "), AC, AttackRoll);
+		DebugMsg += RollDebugMsg;
 	}
-	DebugMsg += FString::Printf(TEXT("AC:%d, AttackRoll:%d = %d(1d20) + %d(BonusMods)\n"), AC, AttackRoll, DiceRoll, BonusMods);
+	DebugMsg += "\n";
 	return IsHit;
 }
 
-uint8 UTurpAbilitySystemBlueprintFL::MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& TargetASC,
-	const ATurpGameStateBase& GameState)
+TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeActionCheck(const EActionEnum Action, const UTurpAbilitySystemComponent& ASC,
+	const ATurpGameStateBase& GameState, FString& DebugMsg)
 {
 	// TODO: add debugging information about what condition gave what status.
 	
-	const auto ConditionStack = TargetASC.GetConditionStackForAction(Action);
+	const auto ConditionStack = ASC.GetConditionStackForAction(Action);
 	if(!ConditionStack)
 	{
 		UE_LOG(Turp, Log, TEXT("%s"), *FString("[TurpAbilitySystemBlueprintFL] Action Enum Doesn't exist on Condition Stack!"));
-		return 0;
+		return {false, 0};;
 	}
 	
 	if(!ConditionStack->ActionStatusMap.Find(EStatusEnum::AutoSave)->IsEmpty())
 	{
 		// Auto Save.
-		return 100;
+		DebugMsg += FString::Printf(TEXT("100(%hs) "), "AutoSave");
+		return {true, 100};
 	}
 	
 	if(!ConditionStack->ActionStatusMap.Find(EStatusEnum::AutoFail)->IsEmpty())
 	{
 		// Auto Fail.
-		return 0;
+		DebugMsg += FString::Printf(TEXT("0(%hs) "), "AutoFail");
+		return {false, 0};
 	}
 
 	int RollResult = 0;
@@ -348,14 +367,17 @@ uint8 UTurpAbilitySystemBlueprintFL::MakeActionCheck(const EActionEnum Action, c
 	if(AdvantageCount > DisadvantageCount)
 	{
 		RollResult = FMath::Max(RollDie(1, 20), RollDie(1, 20));
+		DebugMsg += FString::Printf(TEXT("%d(1d20 %hs) "), RollResult, "Advantage");
 	}
 	if(AdvantageCount < DisadvantageCount)
 	{
 		RollResult = FMath::Min(RollDie(1, 20), RollDie(1, 20));
+		DebugMsg += FString::Printf(TEXT("%d(1d20 %hs) "), RollResult, "Disadvantage");
 	}
 	else
 	{
 		RollResult = RollDie(1, 20);
+		DebugMsg += FString::Printf(TEXT("%d(1d20) "), RollResult);
 	}
 
 	int Modifier = 0;
@@ -365,11 +387,13 @@ uint8 UTurpAbilitySystemBlueprintFL::MakeActionCheck(const EActionEnum Action, c
 		const auto ActionStatus = GameState.GameplayConditionInformation->GetActionStatus(ConditionTag, Action);
 		if(ActionStatus->StatusEnum == EStatusEnum::Modifier)
 		{
-			Modifier += RollDie(ActionStatus->ModifierDice);
+			auto Mod = RollDie(ActionStatus->ModifierDice);
+			DebugMsg += FString::Printf(TEXT("+ %d(%s) "), Mod, *ConditionTag.GetTagName().ToString());
+			Modifier += Mod;
 		}
 	}
 
-	return RollResult + Modifier;
+	return {true, RollResult + Modifier};
 }
 
 EActionEnum UTurpAbilitySystemBlueprintFL::GetActionEnumForTag(const FGameplayTag& SavingThrowTag)

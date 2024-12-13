@@ -23,21 +23,27 @@ FVector ATurpCharacterBase::GetCombatSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation("AttackSocket");
 }
 
-float ATurpCharacterBase::GetClassSpecificAttackRollModifier() const
+float ATurpCharacterBase::GetClassSpecificAttackRollModifier(FString& DebugMsg) const
 {
 	const auto AS = Cast<UTurpAttributeSet>(AbilitySystemComponent->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	if(CharacterClass == ECharacterClassTypes::Wizard)
 	{
-		return Cast<UTurpAttributeSet>(AS)->GetIntelligenceMod();
+		const float IntMod = Cast<UTurpAttributeSet>(AS)->GetIntelligenceMod();
+		DebugMsg += FString::Printf(TEXT("+ %d(%hs) "), static_cast<int>(IntMod), "IntelligenceMod");
+		return IntMod;
 	}
 	if(CharacterClass == ECharacterClassTypes::Cleric)
 	{
-		return Cast<UTurpAttributeSet>(AS)->GetWisdomMod();
+		const float WisMod = Cast<UTurpAttributeSet>(AS)->GetWisdomMod();
+		DebugMsg += FString::Printf(TEXT("+ %d(%hs) "), static_cast<int>(WisMod), "WisdomMod");
+		return WisMod;
 	}
 	if(CharacterClass == ECharacterClassTypes::Fighter)
 	{
 		// Should be either Strength or Dexterity based on weapon equipped.
-		return Cast<UTurpAttributeSet>(AS)->GetStrengthMod();
+		const float StrMod = Cast<UTurpAttributeSet>(AS)->GetStrengthMod();
+		DebugMsg += FString::Printf(TEXT("+ %d(%hs) "), static_cast<int>(StrMod), "StrengthMod");
+		return StrMod;
 	}
 	
 	return 0;

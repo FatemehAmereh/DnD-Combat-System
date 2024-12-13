@@ -184,9 +184,8 @@ void UTurpAbilitySystemComponent::OnTurnEnded()
 
 void UTurpAbilitySystemComponent::OnTagTriggered(const FGameplayTag Tag, int32 Count)
 {
-	UE_LOG(Turp, Log, TEXT("%s: %d"), *Tag.GetTagName().ToString(), Count);
 	const auto GameState = Cast<ATurpGameStateBase>(UGameplayStatics::GetGameState(this));
-
+	
 	TMap<EActionEnum, FActionStatusData> ConditionActionInfo;
 	if(GameState->GameplayConditionInformation->GetConditionInfoWithTag(Tag, ConditionActionInfo))
 	{
@@ -204,6 +203,15 @@ void UTurpAbilitySystemComponent::OnTagTriggered(const FGameplayTag Tag, int32 C
 				//Tag is being Removed.
 				ConditionTagContainer->RemoveTag(Tag);
 			}
+		}
+		
+		if(Count == 1)
+		{
+			UE_LOG(Turp, Log, TEXT("%s: gained condition (%s)"), *GetAvatarActor()->GetName(), *Tag.GetTagName().ToString());
+		}
+		else if(Count == 0)
+		{
+			UE_LOG(Turp, Log, TEXT("%s: lost condition (%s)"), *GetAvatarActor()->GetName(), *Tag.GetTagName().ToString());
 		}
 	}
 }
