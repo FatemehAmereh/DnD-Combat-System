@@ -50,15 +50,15 @@ void ATurpPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 
-	// determine forward direction using the controller
+	// Determine forward direction using the controller.
 	const FRotator Rotation {0.0f, GetControlRotation().Yaw, 0.0f};
 	FVector ForwardDirection = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
-	FVector RightdDirection = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
+	FVector RightDirection = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
 
 	if(APawn* ControlledPawn = GetPawn())
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
-		ControlledPawn->AddMovementInput(RightdDirection, InputAxisVector.X);
+		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
 }
 

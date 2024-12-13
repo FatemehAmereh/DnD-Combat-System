@@ -118,6 +118,7 @@ void ATurnBasedManager::PossessNewCharacter()
 	// TODO: Fix the rotation issue.
 	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	PlayerController->Possess(PartyMembers[ActivePartyMemberIndex].Character);
+	PlayerController->SetControlRotation(PartyMembers[ActivePartyMemberIndex].Character->GetActorRotation());
 }
 
 void ATurnBasedManager::SetUIReference()
