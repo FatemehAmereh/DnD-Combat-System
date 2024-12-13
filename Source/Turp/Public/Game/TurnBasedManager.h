@@ -21,9 +21,6 @@ struct FCharacterInfo
 	TObjectPtr<ATurpCharacterBase> Character = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UAbilitySystemComponent> ASC = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int Initiative = 0;
 };
 

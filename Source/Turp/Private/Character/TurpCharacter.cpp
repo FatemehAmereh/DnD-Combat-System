@@ -4,10 +4,18 @@
 #include "Character/TurpCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/TurpAbilitySystemComponent.h"
+#include "AbilitySystem/TurpAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ATurpCharacter::ATurpCharacter()
 {
+	AbilitySystemComponent = CreateDefaultSubobject<UTurpAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+
+	AttributeSet = CreateDefaultSubobject<UTurpAttributeSet>("AttributeSet");
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.0f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
@@ -18,10 +26,9 @@ ATurpCharacter::ATurpCharacter()
 	bUseControllerRotationRoll = false;
 }
 
-void ATurpCharacter::SetDefaultProperties(UAbilitySystemComponent* ASC,
-	const FCharacterClassData CharacterClassInformation)
+void ATurpCharacter::SetDefaultProperties(const FCharacterClassData CharacterClassInformation)
 {
-	AbilitySystemComponent = ASC;
+	//AbilitySystemComponent = ASC;
 	DefaultPrimaryAttributesEffect = CharacterClassInformation.DefaultPrimaryAttributesEffect;
 	StartUpGameplayAbilities = CharacterClassInformation.StartUpGameplayAbilities;
 	CharacterClass = CharacterClassInformation.CharacterClass;

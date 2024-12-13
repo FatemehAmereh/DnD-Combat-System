@@ -30,12 +30,12 @@ void ATurnBasedManager::BeginPlay()
 	{
 		// Create Ability System Components and Attribute Sets.
 		FCharacterInfo CharacterInfo;
-		const auto ASC = NewObject<UTurpAbilitySystemComponent>(this, UTurpAbilitySystemComponent::StaticClass());
-		ASC->SetIsReplicated(true);
-		ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
-		ASC->RegisterComponent();
-		auto AS = ASC->AddSet<UTurpAttributeSet>();
-		CharacterInfo.ASC = ASC;
+		// const auto ASC = NewObject<UTurpAbilitySystemComponent>(this, UTurpAbilitySystemComponent::StaticClass());
+		// ASC->SetIsReplicated(true);
+		// ASC->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+		// ASC->RegisterComponent();
+		// auto AS = ASC->AddSet<UTurpAttributeSet>();
+		// CharacterInfo.ASC = ASC;
 
 		//CharacterInfo.AS = NewObject<UTurpAttributeSet>(this, UTurpAttributeSet::StaticClass());
 
@@ -51,15 +51,15 @@ void ATurnBasedManager::BeginPlay()
 		//PartyMember->SetPartyIndex(i);
 		PartyMember->SetAbilitySystemComponentOwnerActor(this);
 		const auto s = GameState->CharacterClassInformation->CharacterClassInformation[i];
-		PartyMember->SetDefaultProperties(CharacterInfo.ASC, s);
+		PartyMember->SetDefaultProperties(s);
 		PartyMember->FinishSpawning(SpawnTransform);
 		CharacterInfo.Character = PartyMember;
 	
 		// Roll Initiative.
 		// TODO: Use the UTurpAbilitySystemBlueprintFL::MakeActionCheck To roll.
-		CharacterInfo.Initiative =
-				UTurpAbilitySystemBlueprintFL::RollDie(1, 20) +
-				AS->GetDexterityMod();
+		// CharacterInfo.Initiative =
+		// 		UTurpAbilitySystemBlueprintFL::RollDie(1, 20) +
+		// 		AS->GetDexterityMod();
 
 		PartyMembers.Add(CharacterInfo);
 	}
@@ -97,7 +97,7 @@ void ATurnBasedManager::EndTurn()
 	// TODO: Update active Effect and Tags list.
 	for (const auto& PartyMember : PartyMembers)
 	{
-		const auto ASC = Cast<UTurpAbilitySystemComponent>(PartyMember.ASC);
+		const auto ASC = Cast<UTurpAbilitySystemComponent>(PartyMember.Character->GetAbilitySystemComponent());
 		ASC->OnTurnEnded();
 	}
 	for (const auto& Enemy : Enemies)
@@ -129,5 +129,5 @@ void ATurnBasedManager::SetUIReference()
 
 UAbilitySystemComponent* ATurnBasedManager::GetActivePartyMembersAbilitySystemComponent() const
 {
-	return PartyMembers[ActivePartyMemberIndex].ASC;
+	return PartyMembers[ActivePartyMemberIndex].Character->GetAbilitySystemComponent();
 }

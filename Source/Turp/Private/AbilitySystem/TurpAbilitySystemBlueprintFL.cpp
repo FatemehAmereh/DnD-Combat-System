@@ -289,8 +289,7 @@ bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& Gam
 	bool IsHit = false;
 	
 	const uint8 DiceRoll = MakeActionCheck(EActionEnum::AtkRoll, TargetASC, GameState);
-	auto c = Cast<ATurpCharacterBase>(SourceASC.GetAvatarActor());
-	const float ClassSpecificAttackMod = c->GetClassSpecificAttackRollModifier();
+	const float ClassSpecificAttackMod = Cast<ATurpCharacterBase>(SourceASC.GetAvatarActor())->GetClassSpecificAttackRollModifier();
 	const uint8 BonusMods = static_cast<uint8>(SourceAS.GetProficiencyBonus() + ClassSpecificAttackMod);
 	const uint8 AttackRoll = DiceRoll + BonusMods;
 	const uint8 AC = static_cast<uint8>(TargetAS.GetArmorClass() + TargetAS.GetDexterityMod());
