@@ -64,7 +64,7 @@ private:
 	static TTuple<bool, uint8> MakeSavingThrow(const FGameplayTag& SavingThrowTag, const ATurpGameStateBase& GameState,
 		const UTurpAbilitySystemComponent* TargetASC, const UTurpAttributeSet* SourceAS, const uint8 PreRecordedSaveDC,
 		const UTurpAttributeSet* TargetAS, FString& DebugMsg);
-	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag);
+	static float GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet, const FGameplayTag& SavingThrowTag, FString& DebugMsg);
 
 	// Return true if target is Hit by the attack.
 	static bool MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& SourceASC,

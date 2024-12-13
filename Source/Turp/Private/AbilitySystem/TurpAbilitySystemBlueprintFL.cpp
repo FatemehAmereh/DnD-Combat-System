@@ -95,12 +95,12 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	const auto SourceAttributeSet = Cast<UTurpAttributeSet>(CP.SourceASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 
-	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
-
 	uint8 DamageSaveDC = 0;
 	// Do Damage.
 	if(EffectInfo->Damage.DoesDamage)
 	{
+		FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
+		
 		bool SucceededSavingThrow = false;
 		const bool NeedsSavingThrow = EffectInfo->Damage.SavingThrowTag == FGameplayTag::EmptyTag ? false : true;
 		bool IsHit = false;
@@ -144,12 +144,14 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		}
 		UE_LOG(Turp, Log, TEXT("%s"), *DebugMsg);
 	}
-
+	
 	bool ConditionApplied = false;
 	uint8 ConditionSpellSaveDC = 0;
 	// Apply condition.
 	if(!EffectInfo->Condition.TagsToGrant.IsEmpty())
 	{
+		FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
+		
 		bool ApplyCondition = false;
 		if(EffectInfo->Condition.SavingThrowTag == FGameplayTag::EmptyTag)
 		{
@@ -159,7 +161,8 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 		else
 		{
 			// [IsSuccess, SaveDC]
-			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
+			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag,
+				GameState, TargetASC, SourceAttributeSet, 0, TargetAttributeSet, DebugMsg);
 			ApplyCondition = !SavingThrowResult.Key;
 			ConditionSpellSaveDC = SavingThrowResult.Value;
 		}
@@ -185,13 +188,14 @@ void UTurpAbilitySystemBlueprintFL::ApplyGameplayEffectToTarget(const ATurpGameS
 void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameStateBase& GameState, const FGameplayTag& EffectTag, const FEffectStackElement& EffectStackElement,
 	UTurpAbilitySystemComponent* TargetASC)
 {
-	FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
 	const auto EffectInfo = GameState.GameplayEffectInformation->GetEffectInfoWithTag(EffectTag);
 	const auto TargetAttributeSet = Cast<UTurpAttributeSet>(TargetASC->GetAttributeSet(UTurpAttributeSet::StaticClass()));
 	
 	if(EffectInfo->Damage.DoesDamage && EffectInfo->Damage.ApplyDamageEveryTurn)
 	{
 		// Reapply Damage
+		FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
+		
 		bool SucceededSavingThrow = false;
 		const bool NeedsSavingThrow = EffectInfo->Damage.SavingThrowTag == FGameplayTag::EmptyTag ? false : true;
 		bool IsHit = false;
@@ -229,6 +233,8 @@ void UTurpAbilitySystemBlueprintFL::ReapplyActiveGameplayEffect(const ATurpGameS
 	{
 		if(EffectInfo->Condition.SavingThrowTag != FGameplayTag::EmptyTag)
 		{
+			FString DebugMsg = TargetASC->GetAvatarActor()->GetName() + ":\n";
+			
 			// Check if the granted Effect should be removed.
 			const auto SavingThrowResult = MakeSavingThrow(EffectInfo->Condition.SavingThrowTag, GameState, TargetASC, nullptr, EffectStackElement.ConditionSpellSaveDC, TargetAttributeSet, DebugMsg);
 			const bool SucceededSavingThrow = SavingThrowResult.Key;
@@ -264,25 +270,37 @@ TTuple<bool, uint8> UTurpAbilitySystemBlueprintFL::MakeSavingThrow(const FGamepl
 	bool IsSuccess = false;
 	FString RollDebugMsg = "";	
 	const auto ActionCheck = MakeActionCheck(GetActionEnumForTag(SavingThrowTag), *TargetASC, GameState, RollDebugMsg);
-	const uint8 DiceRoll = ActionCheck.Value;
-	const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(*TargetAS, SavingThrowTag));
-	const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
-
-	const uint8 SaveDC = SourceAS ? SourceAS->GetSpellSaveDC() : PreRecordedSaveDC;
-	if(SaveRoll >= SaveDC)
-	{
-		// Saving throw success.
-		DebugMsg += TEXT("SavingThrow succeded! ");
-		IsSuccess = true;
-	}
-	else
+	if(!ActionCheck.Key)
 	{
 		// Saving throw Fail.
 		DebugMsg += TEXT("SavingThrow Failed! ");
+		DebugMsg += RollDebugMsg;
+		DebugMsg += "\n";
+		return {false, 0};
 	}
-	DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d = %d(1d20) + %d(STMod)\n"),
-		StaticCast<int>(SaveDC), SaveRoll, DiceRoll, SavingThrowModifier);
-	return {IsSuccess, SaveDC};
+	else
+	{
+		const uint8 DiceRoll = ActionCheck.Value;
+        const uint8 SavingThrowModifier = static_cast<uint8>(GetSavingThrowModifier(*TargetAS, SavingThrowTag, RollDebugMsg));
+        const uint8 SaveRoll = DiceRoll + SavingThrowModifier;
+    
+        const uint8 SaveDC = SourceAS ? SourceAS->GetSpellSaveDC() : PreRecordedSaveDC;
+        if(SaveRoll >= SaveDC)
+        {
+        	// Saving throw success.
+        	DebugMsg += TEXT("SavingThrow succeded! ");
+        	IsSuccess = true;
+        }
+        else
+        {
+        	// Saving throw Fail.
+        	DebugMsg += TEXT("SavingThrow Failed! ");
+        }
+        DebugMsg += FString::Printf(TEXT("SpellSaveDC:%d, SaveRoll:%d = "),
+        	StaticCast<int>(SaveDC), SaveRoll);
+		DebugMsg += RollDebugMsg;
+		return {IsSuccess, SaveDC};
+	}
 }
 
 bool UTurpAbilitySystemBlueprintFL::MakeAttackRoll(const ATurpGameStateBase& GameState, const UTurpAbilitySystemComponent& SourceASC,
@@ -429,31 +447,43 @@ EActionEnum UTurpAbilitySystemBlueprintFL::GetActionEnumForTag(const FGameplayTa
 }
 
 float UTurpAbilitySystemBlueprintFL::GetSavingThrowModifier(const UTurpAttributeSet& AttributeSet,
-                                                            const FGameplayTag& SavingThrowTag)
+                                                            const FGameplayTag& SavingThrowTag, FString& DebugMsg)
 {
 	const auto& GameplayTags = FTurpTagsManager::Get();
 	if(SavingThrowTag == GameplayTags.SavingThrow_Strength)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(StrengthSavingThrow) "),
+			StaticCast<int>(AttributeSet.GetStrengthST()));
 		return AttributeSet.GetStrengthST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Dexterity)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(DexteritySavingThrow) "),
+			StaticCast<int>(AttributeSet.GetDexterityST()));
 		return AttributeSet.GetDexterityST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Constitution)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(ConstitutionSavingThrow) "),
+			StaticCast<int>(AttributeSet.GetConstitutionST()));
 		return AttributeSet.GetConstitutionST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Intelligence)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(IntelligenceSavingThrow) "),
+			StaticCast<int>(AttributeSet.GetIntelligenceST()));
 		return AttributeSet.GetIntelligenceST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Wisdom)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(WisdomSavingThrow) "),
+			StaticCast<int>(AttributeSet.GetWisdomST()));
 		return AttributeSet.GetWisdomST();
 	}
 	else if(SavingThrowTag == GameplayTags.SavingThrow_Charisma)
 	{
+		DebugMsg += FString::Printf(TEXT(" + %d(CharismaSavingThrow) "),
+			StaticCast<int>(AttributeSet.GetCharismaST()));
 		return AttributeSet.GetCharismaST();
 	}
 
