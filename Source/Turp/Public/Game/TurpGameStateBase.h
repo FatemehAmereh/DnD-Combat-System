@@ -48,6 +48,4 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets|AbilityInfo")
 	TSubclassOf<UGameplayEffect> DefaultDamageGameplayEffect;
-
-	
 };

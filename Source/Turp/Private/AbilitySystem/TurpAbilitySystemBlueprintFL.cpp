@@ -4,30 +4,18 @@
 #include "AbilitySystem/TurpAbilitySystemBlueprintFL.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "AsyncTreeDifferences.h"
 #include "TurpTagsManager.h"
 #include "TurpUtilities.h"
 #include "AbilitySystem/TurpAbilitySystemComponent.h"
 #include "AbilitySystem/TurpAttributeSet.h"
-#include "AbilitySystem/TurpGameplayEffect.h"
 #include "Character/TurpCharacterBase.h"
 #include "Game/TurpGameStateBase.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Player/TurpPlayerState.h"
-#include "UI/HUD/TurpHUD.h"
-#include "WorkflowOrientedApp/WorkflowTabManager.h"
 
 void UTurpAbilitySystemBlueprintFL::SetSourceASCForCombatPacket(ATurpGameStateBase* GameState, UAbilitySystemComponent* ASC)
 {
 	GameState->CombatPacket.SourceASC = ASC;
 }
-
-// void UTurpAbilitySystemBlueprintFL::SetEffectPropertiesOfAbilityForCombatPacket(ATurpGameStateBase* GameState,
-// 	const FGameplayEffectProperties& EffectProperties)
-// {
-// 	//GameState->CombatPacket.AbilityProperties.e
-// }
 
 void UTurpAbilitySystemBlueprintFL::AddTargetForCombatPacket(ATurpGameStateBase* GameState,
                                                              FTurpAbilityTargetData TargetData)
